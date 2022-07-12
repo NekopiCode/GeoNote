@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".GatherActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/verfügbare_provider"/>
+
+    <Spinner
+        android:id="@+id/spinner_provider"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <ToggleButton
+        android:id="@+id/togglebutton_lokalisierung"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onToggleButtonLokalisierenClick"
+        android:textOff="@string/lokalisierung_starten"
+        android:textOn="@string/lokalisierung_gestartet" />
+
+    <Button
+        android:id="@+id/button_standort_anzeigen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/standort_anzeigen"
+        android:textColor="@color/black"
+        android:onClick="onButtonStandortAnzeigenClick"
+        android:backgroundTint="@color/grey"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/geodaten_empfpangen" />
+
+    <TextView
+        android:id="@+id/textview_output"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""/>
+
+
+</LinearLayout>

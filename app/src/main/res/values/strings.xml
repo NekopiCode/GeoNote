@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Geonotes</string>
+    <string name="verfügbare_provider">Verfügbare Provider</string>
+    <string name="lokalisierung_starten">Lokalisierung Starten</string>
+    <string name="lokalisierung_gestartet">Lokalisierung Gestartet</string>
+    <string name="standort_anzeigen">Standort Anzeigen</string>
+    <string name="geodaten_empfpangen">Geodaten empfangen</string>
+    <string name="placeholder"></string>
+    <string-array name="auswahlliste">
+        <item>passiv</item>
+        <item>gps</item>
+        <item>network</item>
+    </string-array>
+</resources>

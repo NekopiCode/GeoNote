@@ -5,7 +5,12 @@
     <string name="lokalisierung_gestartet">Lokalisierung Gestartet</string>
     <string name="standort_anzeigen">Standort Anzeigen</string>
     <string name="geodaten_empfpangen">Geodaten empfangen</string>
-    <string name="placeholder"></string>
+    <string name="placeholder">Placeholder</string>
+    <string name="notiz">Notiz</string>
+    <string name="notiz_speichern">Notiz Speichern</string>
+    <string name="thema">Thema</string>
+
+
     <string-array name="auswahlliste">
         <item>passiv</item>
         <item>gps</item>

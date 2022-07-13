@@ -1,5 +1,6 @@
 package and06.geonotes
 
+import android.Manifest.permission_group.LOCATION
 import android.content.Context
 import android.content.Intent
 import android.location.Location
@@ -10,10 +11,13 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.*
+import org.osmdroid.util.GeoPoint
+import java.io.Serializable
 
 class GatherActivity : AppCompatActivity() {
 
     companion object {
+        val LOCATION = "location"
         val MIN_TIME = 5000L // in Millisekunden
         val MIN_DISTANCE = 5.0f // in Metern
     }
@@ -84,7 +88,7 @@ class GatherActivity : AppCompatActivity() {
                 )
                 Log.d(javaClass.simpleName, "Lokalisierung gestartet")
             } catch (ex: SecurityException) {
-                Log.e(javaClass.simpleName, "Erforderliche Berechtigung $ex.toString() nicht erteilt"
+                Log.e(javaClass.simpleName, "Erforderliche Berechtigung ${ex.toString()} nicht erteilt"
                 )
             }
             Log.d(javaClass.simpleName, showProperties(locationManager, provider))
@@ -145,8 +149,27 @@ class GatherActivity : AppCompatActivity() {
     }
 
     fun onButtonStandortAnzeigenClick(view: View?){
-        val intent = Intent(this, NoteMapActivity::class.java)
-        startActivity(intent)
+        val spinner = findViewById<Spinner>(R.id.spinner_provider)
+        if (spinner.count == 0) {
+            Toast.makeText(this, "Erforderliche Berechtigungen wurden nicht erteilt", Toast.LENGTH_LONG).show()
+            return
+        }
+        val provider = spinner.selectedItem as String
+
+        val locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+        try {
+            val lastLocation = locationManager.getLastKnownLocation(provider)
+            if (lastLocation == null) {
+                Toast.makeText(applicationContext, "Keine Geoposition vorhanden.\n Ist Standortermittlung Aktiv?", Toast.LENGTH_SHORT).show()
+                return
+            }
+            val intent = Intent(this, NoteMapActivity::class.java)
+            intent.putExtra(LOCATION, GeoPoint(lastLocation.latitude, lastLocation.longitude) as Serializable)
+            startActivity(intent)
+        } catch (ex: SecurityException) {
+            Log.e(javaClass.simpleName, "Erforderliche Berechtigung ${ex.toString()} nicht erteilt")
+        }
+
     }
 
 }

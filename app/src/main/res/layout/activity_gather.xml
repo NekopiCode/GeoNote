@@ -9,6 +9,8 @@
     android:padding="16dp"
     tools:context=".GatherActivity">
 
+
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,25 +29,53 @@
         android:textOff="@string/lokalisierung_starten"
         android:textOn="@string/lokalisierung_gestartet" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1.5dp"
+        android:background="#000"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"/>
+    <TextView
+        android:id="@+id/textview_Aktuelles_Projekt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/placeholder" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/thema"/>
+    <EditText
+        android:id="@+id/edittext_thema_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/notiz"/>
+    <EditText
+        android:id="@+id/edittext_notiz_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:backgroundTint="@color/grey"
+        android:text="@string/notiz_speichern" />
+
     <Button
         android:id="@+id/button_standort_anzeigen"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/standort_anzeigen"
         android:textColor="@color/black"
-        android:onClick="onButtonStandortAnzeigenClick"
-        android:backgroundTint="@color/grey"/>
+        android:backgroundTint="@color/grey"
+        android:onClick="onButtonStandortAnzeigenClick" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/geodaten_empfpangen" />
 
-    <TextView
-        android:id="@+id/textview_output"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""/>
 
 
 </LinearLayout>

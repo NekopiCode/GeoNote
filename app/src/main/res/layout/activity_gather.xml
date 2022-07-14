@@ -39,12 +39,13 @@
         android:id="@+id/textview_Aktuelles_Projekt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/placeholder" />
+        android:text="@string/aktuelles_projekt_prefix" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/thema"/>
+    
     <EditText
         android:id="@+id/edittext_thema_input"
         android:layout_width="match_parent"
@@ -60,6 +61,7 @@
         android:layout_height="wrap_content" />
 
     <Button
+        android:id="@+id/button_notiz_speichern"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@color/black"

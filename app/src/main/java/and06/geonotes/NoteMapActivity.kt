@@ -11,6 +11,7 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.MinimapOverlay
 import java.io.File
+import java.io.Serializable
 
 class NoteMapActivity : AppCompatActivity() {
 
@@ -30,24 +31,23 @@ class NoteMapActivity : AppCompatActivity() {
         val map = findViewById<MapView>(R.id.mapview)
         map.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
 
-        val extras = intent.extras ?: return
-        val location = extras.getSerializable(GatherActivity.LOCATION) as GeoPoint
-
+        val extras = intent.extras
+        if (extras == null) return
+        val location = extras.getParcelable<Location>(GatherActivity.LOCATION)
+        if (location == null) return
         val marker = Marker(map)
         val markerIcon = getDrawable(R.drawable.crosshair)
         marker.icon = markerIcon
         marker.rotation
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-        marker.position =  location
-        marker.title = "Mein Standort"
-        marker.snippet = "Dies ist ein Infotext"
+        marker.position = GeoPoint(location.latitude, location.longitude)
+        marker.title = extras.getString(GatherActivity.TITLE)
+        marker.snippet = extras.getString(GatherActivity.SNIPPET)
         map.overlays.add(marker)
-
         val controller = map.controller
         controller.setCenter(marker.position)
         controller.setZoom(16.0)
         //map.setMapOrientation(45.0f)
-
 
 
     }

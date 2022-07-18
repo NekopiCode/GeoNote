@@ -11,8 +11,11 @@ import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import androidx.appcompat.widget.Toolbar
 import org.osmdroid.util.GeoPoint
 import java.io.Serializable
 import java.util.jar.Manifest
@@ -74,6 +77,10 @@ class GatherActivity : AppCompatActivity() {
 
         if (providers.contains("gps"))
             spinner.setSelection(providers.indexOf("gps"));
+
+        //Toolbar
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
 
 
     }
@@ -241,6 +248,21 @@ class GatherActivity : AppCompatActivity() {
             Toast.makeText(this, "Standortbestimmung nicht erlaubt --\n" + "nur eingeschränkte Funktionalität verfügbar",
                 Toast.LENGTH_LONG).show()
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_gather_activity, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        val id = item.itemId
+        when(id) {
+            R.id.action_settings -> //TODO: EVENT HANDLING AUSPROGRAMMIEREN
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
 

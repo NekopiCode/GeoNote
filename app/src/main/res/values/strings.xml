@@ -10,6 +10,7 @@
     <string name="notiz_speichern">Notiz Speichern</string>
     <string name="thema">Thema</string>
     <string name="aktuelles_projekt_prefix">Aktuelles Projekt:\u0020</string>
+    <string name="action_settings">Einstellungen</string>
 
 
     <string-array name="auswahlliste">

@@ -11,6 +11,10 @@
     <string name="thema">Thema</string>
     <string name="aktuelles_projekt_prefix">Aktuelles Projekt:\u0020</string>
     <string name="action_settings">Einstellungen</string>
+    <string name="title_item_foot">Zu Fuß (9 sec/10 m)</string>
+    <string name="title_item_bicycle">Rad (4 sec/25 m)</string>
+    <string name="title_item_car">PKW (4 sec/50 m)</string>
+    <string name="title_item_car_fast">PKW fern (4 sec/100 m)</string>
 
 
     <string-array name="auswahlliste">

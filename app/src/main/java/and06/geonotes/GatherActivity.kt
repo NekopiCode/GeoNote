@@ -1,24 +1,22 @@
 package and06.geonotes
 
-import android.Manifest.permission_group.LOCATION
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.icu.text.CaseMap
+import android.graphics.drawable.ColorDrawable
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import org.osmdroid.util.GeoPoint
-import java.io.Serializable
-import java.util.jar.Manifest
+import java.text.DateFormat
+import kotlin.math.min
 
 class GatherActivity : AppCompatActivity() {
 
@@ -26,8 +24,8 @@ class GatherActivity : AppCompatActivity() {
         val LOCATION = "location"
         val TITLE = "titel"
         val SNIPPET = "snippet"
-        val MIN_TIME = 5000L // in Millisekunden
-        val MIN_DISTANCE = 5.0f // in Metern
+        var minTime = 4000L // in Millisekunden
+        var minDistance = 25.0f // in Metern
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,8 +39,10 @@ class GatherActivity : AppCompatActivity() {
             android.Manifest.permission.ACCESS_COARSE_LOCATION
         ), 0)
 
+
+        val dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT)
         val textView = findViewById<TextView>(R.id.textview_Aktuelles_Projekt)
-        textView.append(java.util.Date().toString())
+        textView.append(dateFormat.format(java.util.Date()))
 
 
         //Location Manager
@@ -83,6 +83,7 @@ class GatherActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
 
+
     }
 
     private fun showProperties(manager: LocationManager, providerName: String): String {
@@ -109,8 +110,8 @@ class GatherActivity : AppCompatActivity() {
             try {
                 locationManager.requestLocationUpdates(
                     provider,
-                    MIN_TIME,
-                    MIN_DISTANCE,
+                    minTime,
+                    minDistance,
                     locationListener
                 )
                 Log.d(javaClass.simpleName, "Lokalisierung gestartet")
@@ -135,8 +136,8 @@ class GatherActivity : AppCompatActivity() {
                 try {
                     locationManager.requestLocationUpdates(
                         provider,
-                        MIN_TIME,
-                        MIN_DISTANCE,
+                        minTime,
+                        minDistance,
                         locationListener)
                 } catch (ex: SecurityException) {
                     Log.e(javaClass.simpleName, "Erforderliche Berechtigung ${ex.toString()} nicht erteilt")
@@ -259,13 +260,44 @@ class GatherActivity : AppCompatActivity() {
 
         val id = item.itemId
         when(id) {
-            R.id.action_settings -> //TODO: EVENT HANDLING AUSPROGRAMMIEREN
-            return true
+            R.id.item_foot, R.id.item_bicycle, R.id.item_car, R.id.item_car_fast -> {
+                item.setChecked(true)
+                val map = hashMapOf<Int, Pair<Long, Float>>(
+                    R.id.item_foot to  (9000L to 10.0f),
+                    R.id.item_bicycle to (4000L to 25.0f),
+                    R.id.item_car to (4000L to 50.0f),
+                    R.id.item_car_fast to (4000L to 100.0f)
+                )
+                val pair = map.get(id) ?: return true
+                minTime = pair.first
+                minDistance = pair.second
+               // Toast.makeText(this, "Neues GPS-Intervall \"$item.title\". Bitte Lokalisierung neu starten.", Toast.LENGTH_LONG).show()
+                return true
+            }
         }
         return super.onOptionsItemSelected(item)
     }
 
 
+    override fun onPause() {
+        super.onPause()
+        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        locationManager.removeUpdates(locationListener)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (findViewById<ToggleButton>(R.id.togglebutton_lokalisierung).isChecked()){
+            val spinner = findViewById<Spinner>(R.id.spinner_provider)
+            val provider = spinner.selectedItem as String
+            val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            try {
+                locationManager.requestLocationUpdates(provider, minTime, minDistance, locationListener)
+            } catch (ex: SecurityException) {
+                Log.e(javaClass.simpleName, "Erforderliche Berechtigung ${ex.toString()} nicht erteilt")
+            }
+        }
+    }
 
 }
 

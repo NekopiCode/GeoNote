@@ -79,6 +79,7 @@
             android:layout_height="wrap_content"
             android:backgroundTint="@color/grey"
             android:text="@string/notiz_speichern"
+            android:onClick="onButtonNotizSpeichern"
             android:textColor="@color/black" />
 
         <Button

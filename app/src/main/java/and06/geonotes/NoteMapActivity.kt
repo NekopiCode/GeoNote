@@ -29,7 +29,7 @@ class NoteMapActivity : AppCompatActivity() {
         osmConfig.osmdroidTileCache = tileCache
 
         val map = findViewById<MapView>(R.id.mapview)
-        map.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
+        map.setTileSource(TileSourceFactory.MAPNIK)
 
         val extras = intent.extras
         if (extras == null) return
@@ -41,8 +41,16 @@ class NoteMapActivity : AppCompatActivity() {
         marker.rotation
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
         marker.position = GeoPoint(location.latitude, location.longitude)
+
         marker.title = extras.getString(GatherActivity.TITLE)
-        marker.snippet = extras.getString(GatherActivity.SNIPPET)
+        marker.snippet = decimalToSexagesimal(location.latitude, location.longitude)
+        marker.subDescription = extras.getString(GatherActivity.SNIPPET)
+
+        //Back_UP Code
+        //marker.title = extras.getString(GatherActivity.TITLE)
+        //marker.snippet = extras.getString(GatherActivity.SNIPPET)
+
+
         map.overlays.add(marker)
         val controller = map.controller
         controller.setCenter(marker.position)
@@ -51,6 +59,28 @@ class NoteMapActivity : AppCompatActivity() {
 
 
     }
+
+    fun decimalToSexagesimal(latitude: Double, longitude: Double): String {
+        val latDegrees = latitude.toInt()
+        val lonDegrees = longitude.toInt()
+        val latTempMinutes = Math.abs((latitude - latDegrees) * 60)
+        val lonTempMinutes = Math.abs((longitude - lonDegrees) *
+                60)
+        val latMinutes = latTempMinutes.toInt()
+        val lonMinutes = lonTempMinutes.toInt()
+        val latTempSeconds = (latTempMinutes - latMinutes) * 60
+        val lonTempSeconds = (lonTempMinutes - lonMinutes) * 60
+        // auf drei Stellen runden
+        val latSeconds = Math.round(latTempSeconds * 1000)/1000.0
+        val lonSeconds = Math.round(lonTempSeconds * 1000)/1000.0
+        val latDegreesString = Math.abs(latDegrees).toString() + if (latitude < 0) "°S " else "°N "
+        val lonDegreesString = Math.abs(lonDegrees).toString() + if (longitude < 0) "°W " else "°O "
+        return lonDegreesString + lonMinutes + "\' " + lonSeconds +
+                "\'\' / " + latDegreesString + latMinutes + "\' " +
+                latSeconds + "\'\'"
+    }
+
+
 
     override fun onResume() {
         super.onResume()

@@ -260,13 +260,14 @@ class GatherActivity : AppCompatActivity() {
 
         val id = item.itemId
         when(id) {
-            R.id.item_foot, R.id.item_bicycle, R.id.item_car, R.id.item_car_fast -> {
+            R.id.item_foot, R.id.item_bicycle, R.id.item_car, R.id.item_car_fast, R.id.item_nichtBewegen -> {
                 item.setChecked(true)
                 val map = hashMapOf<Int, Pair<Long, Float>>(
                     R.id.item_foot to  (9000L to 10.0f),
                     R.id.item_bicycle to (4000L to 25.0f),
                     R.id.item_car to (4000L to 50.0f),
-                    R.id.item_car_fast to (4000L to 100.0f)
+                    R.id.item_car_fast to (4000L to 100.0f),
+                    R.id.item_nichtBewegen to (60000L to 5.0f)
                 )
                 val pair = map.get(id) ?: return true
                 minTime = pair.first
@@ -297,6 +298,13 @@ class GatherActivity : AppCompatActivity() {
                 Log.e(javaClass.simpleName, "Erforderliche Berechtigung ${ex.toString()} nicht erteilt")
             }
         }
+    }
+
+    fun onButtonNotizSpeichern (view: View?) {
+        Toast.makeText(
+            this,
+            "Notiz Speichern wird mit dem \nnächsten Update/Heft Implementiert",
+            Toast.LENGTH_LONG).show()
     }
 
 }

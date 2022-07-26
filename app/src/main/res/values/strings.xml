@@ -15,6 +15,7 @@
     <string name="title_item_bicycle">Rad (4 sec/25 m)</string>
     <string name="title_item_car">PKW (4 sec/50 m)</string>
     <string name="title_item_car_fast">PKW fern (4 sec/100 m)</string>
+    <string name="noMoving">Stillstand (1 min/1 m)</string>
 
 
     <string-array name="auswahlliste">

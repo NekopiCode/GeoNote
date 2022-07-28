@@ -37,7 +37,7 @@ class NoteMapActivity : AppCompatActivity() {
         if (location == null) return
         val marker = Marker(map)
         val markerIcon = getDrawable(R.drawable.crosshair)
-        marker.icon = markerIcon
+       // marker.icon = markerIcon
         marker.rotation
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
         marker.position = GeoPoint(location.latitude, location.longitude)

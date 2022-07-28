@@ -39,11 +39,9 @@ class GatherActivity : AppCompatActivity() {
             android.Manifest.permission.ACCESS_COARSE_LOCATION
         ), 0)
 
-
         val dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT)
         val textView = findViewById<TextView>(R.id.textview_Aktuelles_Projekt)
         textView.append(dateFormat.format(java.util.Date()))
-
 
         //Location Manager
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -62,28 +60,20 @@ class GatherActivity : AppCompatActivity() {
         )
         spinner.onItemSelectedListener = SpinnerProviderItemSelectedListener()
 
-
-
         //Toggle
         val toggle: ToggleButton = findViewById(R.id.togglebutton_lokalisierung)
         toggle.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 // The toggle is enabled
-
             } else {
                 // The toggle is disabled
             }
         }
-
         if (providers.contains("gps"))
             spinner.setSelection(providers.indexOf("gps"));
-
         //Toolbar
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-
-
-
     }
 
     private fun showProperties(manager: LocationManager, providerName: String): String {
@@ -144,38 +134,9 @@ class GatherActivity : AppCompatActivity() {
                 }
             }
         }
-
         override fun onNothingSelected(p0: AdapterView<*>?) {
         }
 
-    }
-
-    inner class NoteLocationListener : LocationListener {
-        override fun onLocationChanged(location: Location) {
-            Log.d(javaClass.simpleName, "Empfangene Geodaten:\n$location")
-            /*val textview = findViewById<TextView>(R.id.textview_output)
-            textview.append("\nEmpfangene Geodaten:\n$location \n")
-
-             */
-        }
-
-        override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
-        }
-
-        override fun onProviderEnabled(provider: String) {
-
-        }
-
-        override fun onProviderDisabled(provider: String) {
-        }
-    }
-
-    val locationListener = NoteLocationListener()
-
-    override fun onDestroy() {
-        super.onDestroy()
-        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        locationManager.removeUpdates(locationListener)
     }
 
     fun onButtonStandortAnzeigenClick(view: View?){
@@ -185,7 +146,6 @@ class GatherActivity : AppCompatActivity() {
             return
         }
         val provider = spinner.selectedItem as String
-
         val locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
         try {
             val lastLocation = locationManager.getLastKnownLocation(provider)
@@ -197,7 +157,6 @@ class GatherActivity : AppCompatActivity() {
             val intent = Intent(this, NoteMapActivity::class.java)
             intent.putExtra(LOCATION, GeoPoint(lastLocation.latitude, lastLocation.longitude) as Serializable)
             startActivity(intent)
-
              */
             val intent = Intent(this, NoteMapActivity::class.java)
             intent.putExtra(
@@ -213,9 +172,6 @@ class GatherActivity : AppCompatActivity() {
                 findViewById<TextView>(R.id.edittext_notiz_input).text.toString()
             )
             startActivity(intent)
-
-
-
         } catch (ex: SecurityException) {
             Log.e(javaClass.simpleName, "Erforderliche Berechtigung ${ex.toString()} nicht erteilt")
         }
@@ -234,7 +190,6 @@ class GatherActivity : AppCompatActivity() {
         if (providers.contains("gps"))
             spinner.setSelection(providers.indexOf("gps"))
     }
-
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -257,7 +212,6 @@ class GatherActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
         val id = item.itemId
         when(id) {
             R.id.item_foot, R.id.item_bicycle, R.id.item_car, R.id.item_car_fast, R.id.item_nichtBewegen -> {
@@ -279,7 +233,6 @@ class GatherActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-
     override fun onPause() {
         super.onPause()
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -297,6 +250,29 @@ class GatherActivity : AppCompatActivity() {
             } catch (ex: SecurityException) {
                 Log.e(javaClass.simpleName, "Erforderliche Berechtigung ${ex.toString()} nicht erteilt")
             }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        locationManager.removeUpdates(locationListener)
+    }
+
+    val locationListener = NoteLocationListener()
+
+    inner class NoteLocationListener : LocationListener {
+        override fun onLocationChanged(location: Location) {
+            Log.d(javaClass.simpleName, "Empfangene Geodaten:\n$location")
+            /*val textview = findViewById<TextView>(R.id.textview_output)
+            textview.append("\nEmpfangene Geodaten:\n$location \n")
+             */
+        }
+        override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+        }
+        override fun onProviderEnabled(provider: String) {
+        }
+        override fun onProviderDisabled(provider: String) {
         }
     }
 

@@ -35,7 +35,7 @@ class GatherActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_gather)
 
-        //Permissions
+        // TODO: Permissions
         requestPermissions(arrayOf<String>(
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
             android.Manifest.permission.ACCESS_FINE_LOCATION,
@@ -46,7 +46,7 @@ class GatherActivity : AppCompatActivity() {
         val textView = findViewById<TextView>(R.id.textview_Aktuelles_Projekt)
         textView.append(dateFormat.format(java.util.Date()))
 
-        //Location Manager
+        // TODO: Location Manager
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val providers = locationManager.getProviders(true)
         Log.d(javaClass.simpleName, "Verfügbare Provider:")
@@ -54,7 +54,7 @@ class GatherActivity : AppCompatActivity() {
             Log.d(javaClass.simpleName, "Provider: $it")
         }
 
-        //Spinnner
+        // TODO: Spinnner
         val spinner = findViewById<Spinner>(R.id.spinner_provider)
         spinner.adapter = ArrayAdapter<String>(
             this,
@@ -63,22 +63,22 @@ class GatherActivity : AppCompatActivity() {
         )
         spinner.onItemSelectedListener = SpinnerProviderItemSelectedListener()
 
-        //Toggle
+        // TODO: Toggle
         val toggle: ToggleButton = findViewById(R.id.togglebutton_lokalisierung)
         toggle.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                // The toggle is enabled
+                // TODO: The toggle is enabled
             } else {
-                // The toggle is disabled
+                // TODO: The toggle is disabled
             }
         }
         if (providers.contains("gps"))
             spinner.setSelection(providers.indexOf("gps"));
-        //Toolbar
+        // TODO: Toolbar
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        //Room Insert - Test
+        // TODO: Room Insert - Test
         val testProjekt = Projekt(Date().getTime(), "")
         val database = GeoNotesDatabase.getInstance(this)
         GlobalScope.launch {
@@ -294,11 +294,30 @@ class GatherActivity : AppCompatActivity() {
         }
     }
 
-    fun onButtonNotizSpeichern (view: View?) {
-        Toast.makeText(
-            this,
-            "Notiz Speichern wird mit dem \nnächsten Update/Heft Implementiert",
-            Toast.LENGTH_LONG).show()
+    fun onButtonNotizSpeichernClick (view: View?) {
+        val themaText = findViewById<TextView>(R.id.edittext_thema_input).text.toString().trim()
+        val notizText = findViewById<TextView>(R.id.edittext_notiz_input).text.toString().trim()
+        if (themaText.isEmpty() || notizText.isEmpty()) {
+            Toast.makeText(this, "Thema und Notiz dürfen nicht leer sein", Toast.LENGTH_LONG).show()
+            return
+        }
+        var lastLocation : Location? = null
+        var provider = ""
+        try {
+            val locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+            val spinner = findViewById<Spinner>(R.id.spinner_provider)
+            provider = spinner.selectedItem as String
+            lastLocation = locationManager.getLastKnownLocation(provider)
+        } catch ( ex: SecurityException) {
+            Log.e(javaClass.simpleName, "Erforderliche Berechtigung ${ex.toString()} nicht erteilt")
+        }
+        if (lastLocation == null) {
+            Toast.makeText(this, "Noch keine Geoposition ermittelt. Bitte später nochmal versuchen", Toast.LENGTH_LONG).show()
+            return
+        }
+        // TODO: Projekt speichern
+        // TODO: Location speichern
+        // TODO: Notiz speichern
     }
 
 }

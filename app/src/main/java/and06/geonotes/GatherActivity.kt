@@ -16,7 +16,10 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import java.text.DateFormat
+import java.util.*
 import kotlin.math.min
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class GatherActivity : AppCompatActivity() {
 
@@ -74,6 +77,21 @@ class GatherActivity : AppCompatActivity() {
         //Toolbar
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
+
+        //Room Insert - Test
+        val testProjekt = Projekt(Date().getTime(), "")
+        val database = GeoNotesDatabase.getInstance(this)
+        GlobalScope.launch {
+            val id = database.projekteDao().insertProjekt(testProjekt)
+            Log.d(javaClass.simpleName, "Projekt $testProjekt mit id=$id in Datenbank geschrieben")
+        }
+
+        GlobalScope.launch {
+            val projekte = database.projekteDao().getProjekte()
+            projekte.forEach {
+                Log.d(javaClass.simpleName, "Projekte $it")
+            }
+        }
     }
 
     private fun showProperties(manager: LocationManager, providerName: String): String {

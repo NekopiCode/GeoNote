@@ -55,4 +55,13 @@ abstract class GeoNotesDatabase : RoomDatabase() {
             return INSTANCE as GeoNotesDatabase
         }
     }
+    abstract fun projekteDao() : ProjekteDao
+}
+
+@Dao interface ProjekteDao {
+    @Insert (onConflict = OnConflictStrategy.REPLACE)
+    fun insertProjekt(projekt: Projekt): Long
+
+    @Query("SELECT * FROM projekte")
+    fun  getProjekte() : List<Projekt>
 }

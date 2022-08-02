@@ -29,6 +29,7 @@ class GatherActivity : AppCompatActivity() {
         val SNIPPET = "snippet"
         var minTime = 4000L // in Millisekunden
         var minDistance = 25.0f // in Metern
+        var aktuellesProjekt = Projekt(Date().time, "")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,9 +43,10 @@ class GatherActivity : AppCompatActivity() {
             android.Manifest.permission.ACCESS_COARSE_LOCATION
         ), 0)
 
+        // TODO: Datum "textview_aktuelles_projekt"
         val dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT)
         val textView = findViewById<TextView>(R.id.textview_Aktuelles_Projekt)
-        textView.append(dateFormat.format(java.util.Date()))
+        textView.append(dateFormat.format(java.util.Date(aktuellesProjekt.id)))
 
         // TODO: Location Manager
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -78,20 +80,9 @@ class GatherActivity : AppCompatActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        // TODO: Room Insert - Test
-        val testProjekt = Projekt(Date().getTime(), "")
-        val database = GeoNotesDatabase.getInstance(this)
-        GlobalScope.launch {
-            val id = database.projekteDao().insertProjekt(testProjekt)
-            Log.d(javaClass.simpleName, "Projekt $testProjekt mit id=$id in Datenbank geschrieben")
-        }
 
-        GlobalScope.launch {
-            val projekte = database.projekteDao().getProjekte()
-            projekte.forEach {
-                Log.d(javaClass.simpleName, "Projekte $it")
-            }
-        }
+
+
     }
 
     private fun showProperties(manager: LocationManager, providerName: String): String {
@@ -318,6 +309,23 @@ class GatherActivity : AppCompatActivity() {
         // TODO: Projekt speichern
         // TODO: Location speichern
         // TODO: Notiz speichern
+
+        // TODO: Room Insert - Test
+        //val testProjekt = Projekt(Date().getTime(), "")
+        val database = GeoNotesDatabase.getInstance(this)
+        GlobalScope.launch {
+            val id = database.projekteDao().insertProjekt(aktuellesProjekt)
+            Log.d(javaClass.simpleName, "Projekt $aktuellesProjekt mit id=$id in Datenbank geschrieben")
+        }
+
+        GlobalScope.launch {
+            val projekte = database.projekteDao().getProjekte()
+            projekte.forEach {
+                Log.d(javaClass.simpleName, "Projekte $it")
+            }
+        }
+
+
     }
 
 }

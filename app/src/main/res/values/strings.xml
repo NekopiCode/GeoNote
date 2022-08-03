@@ -16,6 +16,11 @@
     <string name="title_item_car">PKW (4 sec/50 m)</string>
     <string name="title_item_car_fast">PKW fern (4 sec/100 m)</string>
     <string name="noMoving">Stillstand (1 min/1 m)</string>
+    <string-array name="dialog_items">
+        <item>Erstes Projekt</item>
+        <item>Zweites Projekt</item>
+        <item>Drittes Projekt</item>
+    </string-array>
 
 
     <string-array name="auswahlliste">

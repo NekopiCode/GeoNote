@@ -1,6 +1,19 @@
 <menu xmlns:android=
     "http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_projekt_bearbeiten"
+        android:title="Projektname bearbeiten"
+        android:icon="@android:drawable/ic_menu_edit"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/menu_projekt_auswaehlen"
+        android:title="Projektname auswählen"
+        android:icon="@android:drawable/ic_menu_set_as"
+        app:showAsAction="ifRoom" />
+
     <item
         android:id="@+id/action_settings"
         android:title="@string/action_settings"

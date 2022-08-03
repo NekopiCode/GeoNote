@@ -1,6 +1,8 @@
 package and06.geonotes
 
+import android.content.ClipData
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.ColorDrawable
@@ -13,13 +15,14 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import kotlinx.coroutines.*
 import java.text.DateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.min
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 class GatherActivity : AppCompatActivity() {
 
@@ -29,8 +32,11 @@ class GatherActivity : AppCompatActivity() {
         val SNIPPET = "snippet"
         var minTime = 4000L // in Millisekunden
         var minDistance = 25.0f // in Metern
-        var aktuellesProjekt = Projekt(Date().time, "")
+        var aktuellesProjekt = Projekt(Date().getTime(), "")
     }
+
+    var aktuellesProjekt = Projekt(Date().getTime(), "")
+    var aktuellesNotiz : Notiz? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,9 +50,8 @@ class GatherActivity : AppCompatActivity() {
         ), 0)
 
         // TODO: Datum "textview_aktuelles_projekt"
-        val dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT)
-        val textView = findViewById<TextView>(R.id.textview_Aktuelles_Projekt)
-        textView.append(dateFormat.format(java.util.Date(aktuellesProjekt.id)))
+        val textview = findViewById<TextView>(R.id.textview_Aktuelles_Projekt)
+        textview.append(aktuellesProjekt.getDescription())
 
         // TODO: Location Manager
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -148,6 +153,7 @@ class GatherActivity : AppCompatActivity() {
 
     }
 
+    // TODO: Button - Standort anzeigen
     fun onButtonStandortAnzeigenClick(view: View?){
         val spinner = findViewById<Spinner>(R.id.spinner_provider)
         if (spinner.count == 0) {
@@ -220,6 +226,7 @@ class GatherActivity : AppCompatActivity() {
         return true
     }
 
+    //TODO: Toolbar onOptionsItemSelected - Menu value function
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         when(id) {
@@ -238,16 +245,104 @@ class GatherActivity : AppCompatActivity() {
                // Toast.makeText(this, "Neues GPS-Intervall \"$item.title\". Bitte Lokalisierung neu starten.", Toast.LENGTH_LONG).show()
                 return true
             }
+
+            R.id.menu_projekt_bearbeiten -> {
+                openProjektBearbeitenDialog()
+            }
+
+            R.id.menu_projekt_auswaehlen -> {
+                openProjektAuswaehlenDialog()
+            }
+            
         }
         return super.onOptionsItemSelected(item)
     }
 
+    // TODO: AlertDialog, Database zugang - Fenster zum bearbeiten von Projektbeschreibung
+    fun openProjektBearbeitenDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_projekt_bearbeiten, null)
+        val textView = dialogView.findViewById<TextView>(R.id.textview_dialog_projekt_bearbeiten)
+        val dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT)
+        textView.text = dateFormat.format(Date(aktuellesProjekt.id))
+        val editText = dialogView.findViewById<TextView>(R.id.edittext_dialog_projekt_bearbeiten)
+        editText.text = aktuellesProjekt.beschreibung
+        val database = GeoNotesDatabase.getInstance(this)
+        with(AlertDialog.Builder(this)){
+            setView(dialogView)
+            setTitle("Projektbeschreibung eingeben/ändern")
+            setPositiveButton("Übernehmen", DialogInterface.OnClickListener{ dialog, id ->
+            // TODO: Projektebeschreibung Ändern
+                aktuellesProjekt.beschreibung = editText.text.toString().trim()
+                findViewById<TextView>(R.id.textview_Aktuelles_Projekt).text =
+                    getString(R.string.aktuelles_projekt_prefix) + aktuellesProjekt.getDescription()
+                // TODO: Projekt-Update in Datenbank
+                GlobalScope.launch {
+                    database.projekteDao().updateProjekt(aktuellesProjekt)
+                    Log.d(javaClass.simpleName, "Update Projekt $aktuellesProjekt")
+                    val projekte = database.projekteDao().getProjekte()
+                    projekte.forEach {
+                        Log.d(javaClass.simpleName, "Projekt $it")
+                    }
+                }
+            })
+            setNegativeButton("Abbrechen", DialogInterface.OnClickListener { dialog, id ->
+
+            }).show()
+        }
+    }
+
+    // TODO: AlertDialog - Projekt auswahlliste
+    // Coroutine Mainthreat wartet bist der innere Threat "Projekte" aus Datenbank geholt hat.
+    //Projektbeschreibung aus der Datenbank wird in eine ArrayList<CharSequence> umkopiert.
+    fun openProjektAuswaehlenDialog() {
+        val database = GeoNotesDatabase.getInstance(this)
+        CoroutineScope(Dispatchers.Main).launch {
+            var projekte: List<Projekt>? = null
+            withContext(Dispatchers.IO) {
+                projekte = database.projekteDao().getProjekte()
+            }
+            if (projekte.isNullOrEmpty()){
+                Toast.makeText(this@GatherActivity, "Noch keine Projekte vorhanden", Toast.LENGTH_LONG).show()
+                return@launch
+            }
+            val items = ArrayList<CharSequence>()
+            projekte?.forEach{
+                items.add(it.getDescription())
+            }
+            with(AlertDialog.Builder(this@GatherActivity)) {
+                setTitle("Projekt auswählen")
+                setItems(items.toArray(emptyArray()),
+                DialogInterface.OnClickListener { dialog, id ->
+            // TODO: aktuelles Projekt auf ausgewähltes Projekt setzen
+                    aktuellesProjekt = projekte?.get(id)!!
+                    val textView = findViewById<TextView>(R.id.textview_Aktuelles_Projekt)
+                    textView.text = getString(R.string.aktuelles_projekt_prefix) +
+                            aktuellesProjekt.getDescription()
+            // TODO: Notiz zum Projekt anzeigen
+                    CoroutineScope(Dispatchers.Main).launch {
+                        withContext(Dispatchers.IO) {
+                            val notizen = database.notizenDao().getNotizen(aktuellesProjekt.id)
+                            aktuellesNotiz = notizen.last()
+                        }
+                        findViewById<TextView>(R.id.edittext_thema_input).text =
+                            aktuellesNotiz?.thema
+                        findViewById<TextView>(R.id.edittext_thema_input).text =
+                            aktuellesNotiz?.notiz
+                    }
+                })
+                show()
+            }
+        }
+    }
+
+    //TODO: Lifecyle - onPause - LocationManager Pause.
     override fun onPause() {
         super.onPause()
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationManager.removeUpdates(locationListener)
     }
 
+    //TODO: Lifecyle - onResume - Update GPS & co.
     override fun onResume() {
         super.onResume()
         if (findViewById<ToggleButton>(R.id.togglebutton_lokalisierung).isChecked()){
@@ -285,6 +380,7 @@ class GatherActivity : AppCompatActivity() {
         }
     }
 
+    // TODO: Button Notiz Speichern
     fun onButtonNotizSpeichernClick (view: View?) {
         val themaText = findViewById<TextView>(R.id.edittext_thema_input).text.toString().trim()
         val notizText = findViewById<TextView>(R.id.edittext_notiz_input).text.toString().trim()
@@ -302,31 +398,60 @@ class GatherActivity : AppCompatActivity() {
         } catch ( ex: SecurityException) {
             Log.e(javaClass.simpleName, "Erforderliche Berechtigung ${ex.toString()} nicht erteilt")
         }
-        if (lastLocation == null) {
+        if (lastLocation == null && aktuellesNotiz == null) {
             Toast.makeText(this, "Noch keine Geoposition ermittelt. Bitte später nochmal versuchen", Toast.LENGTH_LONG).show()
             return
         }
-        // TODO: Projekt speichern
-        // TODO: Location speichern
-        // TODO: Notiz speichern
-
         // TODO: Room Insert - Test
         //val testProjekt = Projekt(Date().getTime(), "")
         val database = GeoNotesDatabase.getInstance(this)
         GlobalScope.launch {
             val id = database.projekteDao().insertProjekt(aktuellesProjekt)
             Log.d(javaClass.simpleName, "Projekt $aktuellesProjekt mit id=$id in Datenbank geschrieben")
-        }
-
-        GlobalScope.launch {
-            val projekte = database.projekteDao().getProjekte()
-            projekte.forEach {
-                Log.d(javaClass.simpleName, "Projekte $it")
+            if (aktuellesNotiz == null && lastLocation !== null) {
+                // TODO: Location speichern
+                database.locationsDao().insertLocation(
+                    Location(
+                    lastLocation.latitude,
+                    lastLocation.longitude,
+                    lastLocation.altitude,
+                    provider
+                ))
+                // TODO: Notiz speichern
+                aktuellesNotiz = Notiz(
+                    null,
+                    aktuellesProjekt.id,
+                    lastLocation.latitude,
+                    lastLocation.longitude,
+                    themaText,
+                    notizText
+                )
+                aktuellesNotiz?.id = database.notizenDao().insertNotiz(aktuellesNotiz!!)
+                Log.d(javaClass.simpleName, "Notiz $aktuellesNotiz gespeichert")
+            } else if (aktuellesNotiz != null){
+                // TODO: Notiz aktualisieren
+                aktuellesNotiz?.thema = themaText
+                aktuellesNotiz?.notiz = notizText
+                database.notizenDao().insertNotiz(aktuellesNotiz!!)
+                Log.d(javaClass.simpleName, "Notiz $aktuellesNotiz aktualisiert")
             }
         }
-
-
+        //Alert Dialog
+        with(AlertDialog.Builder(this)) {
+            setTitle("Notiz weiter bearbeiten?")
+            setNegativeButton("Nein", DialogInterface.OnClickListener {
+                    dialog, id ->
+                aktuellesNotiz == null
+                findViewById<TextView>(R.id.edittext_thema_input).text = ""
+                findViewById<TextView>(R.id.edittext_notiz_input).text = ""
+            })
+            setPositiveButton("Ja", DialogInterface.OnClickListener{
+                dialog, id ->
+            })
+            show()
+        }
     }
+
 
 }
 

@@ -46,16 +46,16 @@ class NoteMapActivity : AppCompatActivity() {
         marker.snippet = decimalToSexagesimal(location.latitude, location.longitude)
         marker.subDescription = extras.getString(GatherActivity.SNIPPET)
 
-        //Back_UP Code
-        //marker.title = extras.getString(GatherActivity.TITLE)
-        //marker.snippet = extras.getString(GatherActivity.SNIPPET)
+
+        // marker.title = extras.getString(GatherActivity.TITLE)
+        // marker.snippet = extras.getString(GatherActivity.SNIPPET)
 
 
         map.overlays.add(marker)
         val controller = map.controller
         controller.setCenter(marker.position)
         controller.setZoom(16.0)
-        //map.setMapOrientation(45.0f)
+        // map.setMapOrientation(45.0f)
 
 
     }
@@ -82,12 +82,14 @@ class NoteMapActivity : AppCompatActivity() {
 
 
 
+    // onPause - Map Restart
     override fun onResume() {
         super.onResume()
         val map = findViewById<MapView>(R.id.mapview)
         map.onResume()
     }
 
+    // onPause - Map Pause
     override fun onPause() {
         super.onPause()
         val map = findViewById<MapView>(R.id.mapview)

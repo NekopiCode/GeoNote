@@ -12,7 +12,7 @@ data class Projekt(
     var beschreibung: String?
 ) {
     // Projektbeschreibung wird als formatiertes Datum angezeigt wenn die Beschreibung leer ist
-    //Andernfalls soll die Beschreibung, gefolgt vom formatierten Datum in Klammern, angezeigt werden
+    // Andernfalls soll die Beschreibung, gefolgt vom formatierten Datum in Klammern, angezeigt werden
     fun getDescription(): String {
         val dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT)
         val dateString = dateFormat.format(id)
@@ -97,4 +97,11 @@ abstract class GeoNotesDatabase : RoomDatabase() {
 
     @Query ("SELECT * from notizen where projektId = :projektId")
     fun  getNotizen(projektId: Long): List<Notiz>
+
+    @Query("SELECT * from notizen where projektId = :projektId AND id > :notizId ORDER BY id ASC")
+    fun getNextNotizen(notizId: Long, projektId: Long): List<Notiz>?
+
+    @Query("SELECT * from notizen where projektId = :projektId AND id < :notizId ORDER BY id ASC")
+    fun getPreviousNotizen(notizId: Long, projektId: Long) : List<Notiz>?
+
 }

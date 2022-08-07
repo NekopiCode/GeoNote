@@ -59,7 +59,7 @@
             android:text="@string/thema" />
 
         <EditText
-            android:id="@+id/edittext_thema_input"
+            android:id="@+id/edittext_thema"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
@@ -69,9 +69,50 @@
             android:text="@string/notiz" />
 
         <EditText
-            android:id="@+id/edittext_notiz_input"
+            android:id="@+id/edittext_notiz"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <ImageButton
+                android:id="@+id/button_previous"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onButtonVorherigeNotizClick"
+                android:src="@android:drawable/ic_media_previous"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/button_next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onButtonNaechsteNotizClick"
+                android:src="@android:drawable/ic_media_next"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Vorherige Notiz"
+                app:layout_constraintLeft_toRightOf= "@+id/button_previous"
+                app:layout_constraintTop_toTopOf= "@+id/button_previous"
+                app:layout_constraintBottom_toBottomOf= "@+id/button_previous"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nächste Notiz"
+                app:layout_constraintRight_toLeftOf= "@+id/button_next"
+                app:layout_constraintTop_toTopOf= "@+id/button_next"
+                app:layout_constraintBottom_toBottomOf= "@+id/button_next"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <Button
             android:id="@+id/button_notiz_speichern"

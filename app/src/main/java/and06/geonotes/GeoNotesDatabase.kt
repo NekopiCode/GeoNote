@@ -78,7 +78,7 @@ abstract class GeoNotesDatabase : RoomDatabase() {
     fun insertProjekt(projekt: Projekt): Long
 
     @Query("SELECT * FROM projekte")
-    fun  getProjekte() : List<Projekt>
+    fun getProjekte() : List<Projekt>
 
     @Update
     fun updateProjekt (projekt: Projekt)

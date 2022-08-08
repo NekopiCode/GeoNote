@@ -31,7 +31,6 @@ class GatherActivity : AppCompatActivity() {
         val SNIPPET = "snippet" //
         var minTime = 4000L // in Millisekunden
         var minDistance = 25.0f // in Metern
-        var aktuellesProjekt = Projekt(Date().getTime(), "")
     }
 
     var aktuellesProjekt = Projekt(Date().getTime(), "")
@@ -495,10 +494,8 @@ class GatherActivity : AppCompatActivity() {
 
     // Button - Vorherige Notiz & Nächste Notiz
     fun onButtonVorherigeNotizClick(view: View) {
-        val textViewThema =
-            findViewById<TextView>(R.id.edittext_thema)
-        val textViewNotiz =
-            findViewById<TextView>(R.id.edittext_notiz)
+        val textViewThema = findViewById<TextView>(R.id.edittext_thema)
+        val textViewNotiz = findViewById<TextView>(R.id.edittext_notiz)
         if (aktuelleNotiz == null) {
             if (textViewThema.text.isNotEmpty() ||
                 textViewNotiz.text.isNotEmpty()) { // Fall 1
@@ -535,21 +532,17 @@ class GatherActivity : AppCompatActivity() {
         if (aktuelleNotiz == null) {
             if (textViewThema.text.isNotEmpty() || textViewNotiz.text.isNotEmpty()
             ) {
-                Toast.makeText(
-                    this, "Notiz wurde noch nicht gespeichert",
-                    Toast.LENGTH_LONG
-                ).show() // Fall 1
+                // Fall 1
+                Toast.makeText(this, "Notiz wurde noch nicht gespeichert", Toast.LENGTH_LONG).show()
             }
             return // Fall 1 und Fall 2
         }
+
         val database = GeoNotesDatabase.getInstance(this)
         CoroutineScope(Dispatchers.Main).launch {
             var notizen: List<Notiz>? = null
             withContext(Dispatchers.IO) {
-                notizen = database.notizenDao().getNextNotizen(
-                        aktuelleNotiz?.id!!,
-                        aktuellesProjekt.id
-                    )
+                notizen = database.notizenDao().getNextNotizen(aktuelleNotiz?.id!!, aktuellesProjekt.id)
             }
             if (!notizen.isNullOrEmpty()) { // Fall 3a)
                 aktuelleNotiz = notizen?.first()
@@ -562,8 +555,21 @@ class GatherActivity : AppCompatActivity() {
             }
         }
     }
-
-    // Activity End
 }
+
+/*
+    CoroutineScope(Dispatchers.Main).launch {
+        withContext(Dispatchers.IO) {
+            val notizen = database.notizenDao().getNotizen(aktuellesProjekt.id)
+            aktuelleNotiz = notizen.last()
+        }
+        findViewById<TextView>(R.id.edittext_thema).text =
+            aktuelleNotiz?.thema
+        findViewById<TextView>(R.id.edittext_notiz).text =
+            aktuelleNotiz?.notiz
+    }
+*/
+// Activity End
+
 
 

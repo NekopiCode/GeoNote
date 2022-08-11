@@ -24,13 +24,14 @@ import kotlin.collections.ArrayList
 
 class GatherActivity : AppCompatActivity() {
 
-
     companion object {
         val LOCATION = "location"
         val TITLE = "titel"
         val SNIPPET = "snippet" //
         var minTime = 4000L // in Millisekunden
         var minDistance = 25.0f // in Metern
+        val NOTIZEN = "notizen"
+        val INDEX_AKTUELLE_NOTIZ = "index_aktuelle_notiz"
     }
 
     var aktuellesProjekt = Projekt(Date().getTime(), "")
@@ -173,17 +174,18 @@ class GatherActivity : AppCompatActivity() {
                 Toast.LENGTH_LONG).show()
             return
         }
-        val intent = Intent(this, NoteMapActivity::class.java)
-        intent.putExtra("AKTUELLE_NOTIZ", aktuelleNotiz)
-        startActivity(intent)
-        val spinner = findViewById<Spinner>(R.id.spinner_provider)
-        if (spinner.count == 0) {
-            Toast.makeText(
-                this,
-                "Erforderliche Berechtigungen wurden nicht erteilt",
-                Toast.LENGTH_LONG
-            ).show()
-            return
+       val database = GeoNotesDatabase.getInstance(this)
+        CoroutineScope(Dispatchers.Main).launch {
+            var notizen : List<Notiz>? = null
+            withContext(Dispatchers.IO) {
+                notizen = database.notizenDao().getNotizen(aktuellesProjekt.id)
+            }
+            if (!notizen.isNullOrEmpty()) {
+                val intent = Intent(this@GatherActivity, NoteMapActivity::class.java)
+                intent.putParcelableArrayListExtra(NOTIZEN, ArrayList<Notiz>(notizen!!))
+                intent.putExtra(INDEX_AKTUELLE_NOTIZ, notizen?.indexOf(aktuelleNotiz!!))
+                startActivity(intent)
+            }
         }
     }
 

@@ -15,6 +15,12 @@ import java.io.Serializable
 
 class NoteMapActivity : AppCompatActivity() {
 
+
+
+
+
+
+    //onCreate - Start
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_notemap)
@@ -31,12 +37,27 @@ class NoteMapActivity : AppCompatActivity() {
         val map = findViewById<MapView>(R.id.mapview)
         map.setTileSource(TileSourceFactory.MAPNIK)
 
+        val extras = intent.extras ?: return
+        val marker = Marker(map)
+        val notiz = extras.getParcelable<Notiz>("AKTUELLE_NOTIZ")!!
+        marker.position = GeoPoint(notiz.latitude, notiz.longitude)
+        marker.title = notiz.thema
+        marker.subDescription = notiz.notiz
+
+
+
+
+
+
+
+        /*
         val extras = intent.extras
         if (extras == null) return
         val location = extras.getParcelable<Location>(GatherActivity.LOCATION)
         if (location == null) return
         val marker = Marker(map)
         val markerIcon = getDrawable(R.drawable.crosshair)
+
        // marker.icon = markerIcon
         marker.rotation
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
@@ -49,6 +70,9 @@ class NoteMapActivity : AppCompatActivity() {
 
         // marker.title = extras.getString(GatherActivity.TITLE)
         // marker.snippet = extras.getString(GatherActivity.SNIPPET)
+
+         */
+
 
 
         map.overlays.add(marker)

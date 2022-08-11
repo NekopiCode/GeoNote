@@ -168,6 +168,14 @@ class GatherActivity : AppCompatActivity() {
 
     // Button - Standort anzeigen
     fun onButtonStandortAnzeigenClick(view: View?) {
+        if (aktuelleNotiz == null) {
+            Toast.makeText(this, "Bitte Notiz auswählen oder speichern",
+                Toast.LENGTH_LONG).show()
+            return
+        }
+        val intent = Intent(this, NoteMapActivity::class.java)
+        intent.putExtra("AKTUELLE_NOTIZ", aktuelleNotiz)
+        startActivity(intent)
         val spinner = findViewById<Spinner>(R.id.spinner_provider)
         if (spinner.count == 0) {
             Toast.makeText(
@@ -176,36 +184,6 @@ class GatherActivity : AppCompatActivity() {
                 Toast.LENGTH_LONG
             ).show()
             return
-        }
-        val provider = spinner.selectedItem as String
-        val locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
-        try {
-            val lastLocation = locationManager.getLastKnownLocation(provider)
-            if (lastLocation == null) {
-                Toast.makeText(
-                    applicationContext,
-                    "Keine Geoposition vorhanden.\n Ist Standortermittlung Aktiv?",
-                    Toast.LENGTH_SHORT
-                ).show()
-                return
-            }
-
-            val intent = Intent(this, NoteMapActivity::class.java)
-            intent.putExtra(
-                LOCATION,
-                lastLocation
-            )
-            intent.putExtra(
-                TITLE,
-                findViewById<TextView>(R.id.edittext_thema).text.toString()
-            )
-            intent.putExtra(
-                SNIPPET,
-                findViewById<TextView>(R.id.edittext_notiz).text.toString()
-            )
-            startActivity(intent)
-        } catch (ex: SecurityException) {
-            Log.e(javaClass.simpleName, "Erforderliche Berechtigung ${ex.toString()} nicht erteilt")
         }
     }
 

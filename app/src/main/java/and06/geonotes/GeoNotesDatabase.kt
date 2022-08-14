@@ -33,7 +33,7 @@ data class Location(
     val altitude: Double,
     val provider: String
 )
-@Parcelize
+@kotlinx.android.parcel.Parcelize
 @Entity(
     tableName = "notizen",
     indices = arrayOf(
@@ -105,5 +105,8 @@ abstract class GeoNotesDatabase : RoomDatabase() {
 
     @Query("SELECT * from notizen where projektId = :projektId AND id < :notizId ORDER BY id ASC")
     fun getPreviousNotizen(notizId: Long, projektId: Long) : List<Notiz>?
+
+    @Query("SELECT * from notizen where id = :id")
+    fun getNotiz(id: Long): Notiz
 
 }

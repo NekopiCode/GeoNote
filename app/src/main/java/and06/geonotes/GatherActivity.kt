@@ -184,7 +184,7 @@ class GatherActivity : AppCompatActivity() {
                 val intent = Intent(this@GatherActivity, NoteMapActivity::class.java)
                 intent.putParcelableArrayListExtra(NOTIZEN, ArrayList<Notiz>(notizen!!))
                 intent.putExtra(INDEX_AKTUELLE_NOTIZ, notizen?.indexOf(aktuelleNotiz!!))
-                startActivity(intent)
+                startActivityForResult(intent, 0)
             }
         }
     }
@@ -244,15 +244,12 @@ class GatherActivity : AppCompatActivity() {
                 minDistance = pair.second
                 return true
             }
-
             R.id.menu_projekt_bearbeiten -> {
                 openProjektBearbeitenDialog()
             }
-
             R.id.menu_projekt_auswaehlen -> {
                 openProjektAuswaehlenDialog()
             }
-
         }
         return super.onOptionsItemSelected(item)
     }
@@ -290,7 +287,6 @@ class GatherActivity : AppCompatActivity() {
         }
     }
 
-
     // AlertDialog - Projekt auswahlliste
     // Coroutine Mainthreat wartet bist der innere Threat "Projekte" aus Datenbank geholt hat.
     // Projektbeschreibung aus der Datenbank wird in eine ArrayList<CharSequence> umkopiert.
@@ -302,11 +298,7 @@ class GatherActivity : AppCompatActivity() {
                 projekte = database.projekteDao().getProjekte()
             }
             if (projekte.isNullOrEmpty()) {
-                Toast.makeText(
-                    this@GatherActivity,
-                    "Noch keine Projekte vorhanden",
-                    Toast.LENGTH_LONG
-                ).show()
+                Toast.makeText(this@GatherActivity, "Noch keine Projekte vorhanden", Toast.LENGTH_LONG).show()
                 return@launch
             }
             val items = ArrayList<CharSequence>()
@@ -384,18 +376,15 @@ class GatherActivity : AppCompatActivity() {
             Log.d(javaClass.simpleName, "Empfangene Geodaten:\n$location")
 
         }
-
         override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
         }
-
         override fun onProviderEnabled(provider: String) {
         }
-
         override fun onProviderDisabled(provider: String) {
         }
     }
 
-    // Button Notiz Speichern
+    // Button - Notiz Speichern
     fun onButtonNotizSpeichernClick(view: View?) {
         val themaText = findViewById<TextView>(R.id.edittext_thema).text.toString().trim()
         val notizText = findViewById<TextView>(R.id.edittext_notiz).text.toString().trim()
@@ -535,21 +524,29 @@ class GatherActivity : AppCompatActivity() {
             }
         }
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode != RESULT_OK) return
+        if (requestCode != 0) return
+        val extras = data?.getExtras() ?: return
+        val notizID = extras.getLong(NoteMapActivity.AKTUELLE_NOTIZ_ID)
+       var database = GeoNotesDatabase.getInstance(this)
+        CoroutineScope(Dispatchers.Main).launch {
+            var notiz : Notiz? = null
+            withContext(Dispatchers.IO) {
+                notiz = database.notizenDao().getNotiz(notizID)
+            }
+            if (notiz != null) {
+                aktuelleNotiz = notiz
+                findViewById<TextView>(R.id.edittext_thema).text = aktuelleNotiz?.thema
+                findViewById<TextView>(R.id.edittext_notiz).text = aktuelleNotiz?.notiz
+            }
+        }
+    }
+
 }
 
-/*
-    CoroutineScope(Dispatchers.Main).launch {
-        withContext(Dispatchers.IO) {
-            val notizen = database.notizenDao().getNotizen(aktuellesProjekt.id)
-            aktuelleNotiz = notizen.last()
-        }
-        findViewById<TextView>(R.id.edittext_thema).text =
-            aktuelleNotiz?.thema
-        findViewById<TextView>(R.id.edittext_notiz).text =
-            aktuelleNotiz?.notiz
-    }
-*/
-// Activity End
 
 
 

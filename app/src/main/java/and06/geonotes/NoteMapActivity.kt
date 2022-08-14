@@ -4,6 +4,9 @@ package and06.geonotes
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.ContactsContract
+import android.widget.ImageButton
+import androidx.activity.OnBackPressedCallback
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -14,6 +17,10 @@ import java.io.File
 import java.io.Serializable
 
 class NoteMapActivity : AppCompatActivity() {
+
+    companion object {
+        val AKTUELLE_NOTIZ_ID = "aktuelle_notiz_id"
+    }
 
     //onCreate - Start
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +55,30 @@ class NoteMapActivity : AppCompatActivity() {
         controller.setCenter(GeoPoint(aktuelleNotiz.latitude, aktuelleNotiz.longitude))
         controller.setZoom(15.5)
 
+        //Button - Kamera auf vorherige/nächste Notiz umschalten
+        val buttonPrevious = findViewById<ImageButton>(R.id.button_previous_notiz)
+        buttonPrevious.setOnClickListener{
+            indexAktuelleNotiz = if (indexAktuelleNotiz == 0)
+                notizen.size-1 else indexAktuelleNotiz-1
+            val notiz = notizen.get(indexAktuelleNotiz)
+            controller.setCenter(GeoPoint(notiz.latitude, notiz.longitude))
+        }
 
+        val buttonNext = findViewById<ImageButton>(R.id.button_next_notiz)
+        buttonNext.setOnClickListener {
+            indexAktuelleNotiz = (indexAktuelleNotiz + 1) % notizen.size
+            val notiz = notizen.get(indexAktuelleNotiz)
+            controller.setCenter(GeoPoint(notiz.latitude, notiz.longitude))
+        }
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+            val pushIntent = getIntent()
+                pushIntent.putExtra(AKTUELLE_NOTIZ_ID, notizen.get(indexAktuelleNotiz).id)
+                setResult(RESULT_OK, pushIntent)
+                finish()
+            }
+        })
 
 
 

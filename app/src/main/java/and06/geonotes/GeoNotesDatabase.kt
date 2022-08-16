@@ -10,9 +10,7 @@ import java.text.DateFormat
 
 data class Projekt(@PrimaryKey val id: Long, var beschreibung: String?) {
     fun getDescription(): String {
-        val dateFormat =
-            DateFormat.getDateTimeInstance(DateFormat.LONG,
-                DateFormat.SHORT) // Import!
+        val dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT) // Import!
         val dateString = dateFormat.format(id)
         return if (beschreibung.isNullOrEmpty()) dateString else
             "$beschreibung ($dateString)"
@@ -31,26 +29,31 @@ data class Location(
         [ForeignKey(entity = Projekt::class, parentColumns = ["id"], childColumns = ["projektId"]),
         ForeignKey(entity = Location::class, parentColumns = ["latitude", "longitude"], childColumns = ["latitude", "longitude"])])
 
-data class Notiz(@PrimaryKey(autoGenerate = true) var id: Long?
-                 = null,
+data class Notiz(@PrimaryKey(autoGenerate = true)
+                 var id: Long? = null,
                  val projektId: Long,
                  val latitude: Double,
                  val longitude: Double,
                  var thema: String,
                  var notiz: String): Parcelable
+
 @Dao interface ProjekteDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertProjekt(projekt: Projekt): Long
+
     @Update
     fun updateProjekt(projekt: Projekt)
+
     @Query("SELECT * FROM projekte")
     fun getProjekte(): List<Projekt>
+
     @Query("SELECT * FROM projekte where id=:id")
     fun getProjekt(id: Long): Projekt
 }
 @Dao interface LocationsDao {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertLocation(location: Location): Long
+
     @Query("SELECT * FROM locations")
     fun getLocations(): List<Location>
 }
@@ -73,6 +76,20 @@ data class Notiz(@PrimaryKey(autoGenerate = true) var id: Long?
 
     @Query("SELECT * from notizen where id = :id")
     fun getNotiz(id: Long): Notiz
+
+    @Query("SELECT * from notizen where notiz")
+    fun checkNotizen(): Notiz
+
+/*
+    @Query("SELECT * from notizen where notiz")
+    fun checkNotiz() : String
+
+    @Query("SELECT * from notizen where thema")
+    fun checkThema() : String
+
+ */
+
+
 }
 @Database(entities = [Projekt::class, Notiz::class, Location::class], version = 1)
 

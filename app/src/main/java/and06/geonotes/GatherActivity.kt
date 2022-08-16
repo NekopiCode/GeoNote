@@ -187,6 +187,7 @@ class GatherActivity : AppCompatActivity() {
                 startActivityForResult(intent, 0)
             }
         }
+        autoSave()
     }
 
     fun initSpinnerProviders() {
@@ -320,13 +321,28 @@ class GatherActivity : AppCompatActivity() {
                                 val notizen = database.notizenDao().getNotizen(aktuellesProjekt.id)
                                 aktuelleNotiz = notizen.last()
                             }
-                            findViewById<TextView>(R.id.edittext_thema).text =
-                                aktuelleNotiz?.thema
-                            findViewById<TextView>(R.id.edittext_notiz).text =
-                                aktuelleNotiz?.notiz
+                            findViewById<TextView>(R.id.edittext_thema).text = aktuelleNotiz?.thema
+                            findViewById<TextView>(R.id.edittext_notiz).text = aktuelleNotiz?.notiz
                         }
                     })
                 show()
+            }
+        }
+    }
+
+    fun autoSave() {
+        val themaText = findViewById<TextView>(R.id.edittext_thema).text.toString().trim()
+        val notizText = findViewById<TextView>(R.id.edittext_notiz).text.toString().trim()
+        val database = GeoNotesDatabase.getInstance(this)
+
+        GlobalScope.launch {
+            if (aktuelleNotiz != null) {
+                if (notizText != aktuelleNotiz?.notiz.toString() || themaText != aktuelleNotiz?.thema.toString())
+                // Notiz aktualisieren
+                    aktuelleNotiz?.thema = themaText
+                aktuelleNotiz?.notiz = notizText
+                database.notizenDao().insertNotiz(aktuelleNotiz!!)
+                Log.d(javaClass.simpleName, "Notiz $aktuelleNotiz aktualisiert")
             }
         }
     }
@@ -335,17 +351,12 @@ class GatherActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        autoSave()
+
         locationManager.removeUpdates(locationListener)
 
-        val themaText = findViewById<TextView>(R.id.edittext_thema).text.toString()
-        val notizText = findViewById<TextView>(R.id.edittext_notiz).text.toString()
 
-        if (themaText !== aktuelleNotiz?.thema || notizText !== aktuelleNotiz?.notiz) {
-
-
-        }
     }
-
 
     // Lifecyle - onResume - Update GPS & co.
     override fun onResume() {
@@ -422,20 +433,15 @@ class GatherActivity : AppCompatActivity() {
         val database = GeoNotesDatabase.getInstance(this)
         GlobalScope.launch {
             val id = database.projekteDao().insertProjekt(aktuellesProjekt)
-            Log.d(
-                javaClass.simpleName,
-                "Projekt $aktuellesProjekt mit id=$id in Datenbank geschrieben"
-            )
+            Log.d(javaClass.simpleName, "Projekt $aktuellesProjekt mit id=$id in Datenbank geschrieben")
             if (aktuelleNotiz == null && lastLocation !== null) {
                 // Location speichern
-                database.locationsDao().insertLocation(
-                    Location(
+                database.locationsDao().insertLocation(Location(
                         lastLocation.latitude,
                         lastLocation.longitude,
                         lastLocation.altitude,
-                        provider
-                    )
-                )
+                        provider))
+
                 // Notiz speichern
                 aktuelleNotiz = Notiz(
                     null,
@@ -486,12 +492,10 @@ class GatherActivity : AppCompatActivity() {
             var notizen : List<Notiz>? = null
             withContext(Dispatchers.IO) {
                 if (aktuelleNotiz == null) {
-                    notizen =
-                        database.notizenDao().getNotizen(aktuellesProjekt.id) // Fall
-                    2
+                    notizen = database.notizenDao().getNotizen(aktuellesProjekt.id)
+                    // Fall 2
                 } else {
-                    notizen =
-                        database.notizenDao().getPreviousNotizen(aktuelleNotiz?.id!!,
+                    notizen = database.notizenDao().getPreviousNotizen(aktuelleNotiz?.id!!,
                             aktuellesProjekt.id) // Fall 3
                 }
             }
@@ -501,6 +505,7 @@ class GatherActivity : AppCompatActivity() {
                 textViewNotiz.text = aktuelleNotiz?.notiz
             }
         }
+        autoSave()
     }
 
     fun onButtonNaechsteNotizClick(view: View) {
@@ -531,6 +536,7 @@ class GatherActivity : AppCompatActivity() {
                 textViewNotiz.text = ""
             }
         }
+        autoSave()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

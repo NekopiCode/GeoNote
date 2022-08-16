@@ -336,6 +336,14 @@ class GatherActivity : AppCompatActivity() {
         super.onPause()
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationManager.removeUpdates(locationListener)
+
+        val themaText = findViewById<TextView>(R.id.edittext_thema).text.toString()
+        val notizText = findViewById<TextView>(R.id.edittext_notiz).text.toString()
+
+        if (themaText !== aktuelleNotiz?.thema || notizText !== aktuelleNotiz?.notiz) {
+
+
+        }
     }
 
 

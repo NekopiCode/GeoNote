@@ -247,7 +247,7 @@ class GatherActivity : AppCompatActivity() {
             }
             R.id.menu_projekt_bearbeiten -> { openProjektBearbeitenDialog() }
             R.id.menu_projekt_auswaehlen -> { openProjektAuswaehlenDialog() }
-            R.id.notizLoeschen -> {notizLoeschen()}
+            R.id.notizLoeschen -> {notizLoeschen()} 
         }
         return super.onOptionsItemSelected(item)
     }

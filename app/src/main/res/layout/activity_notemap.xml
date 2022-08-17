@@ -14,14 +14,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center|left"
-        android:alpha="0.75"
+        android:alpha="0.85"
         android:src="@android:drawable/ic_media_previous"
         android:id="@+id/button_previous_notiz" />
 
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:alpha="0.75"
+        android:alpha="0.85"
         android:src="@android:drawable/ic_media_next"
         android:layout_gravity="center|right"
         android:id="@+id/button_next_notiz"/>

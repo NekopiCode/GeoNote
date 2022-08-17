@@ -2,23 +2,31 @@
     "http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+
+    <item
+        android:id="@+id/notizLoeschen"
+        android:title="Notiz Löschen"
+        android:icon="@android:drawable/ic_menu_delete"
+        app:showAsAction="always" />
+
     <item
         android:id="@+id/menu_projekt_bearbeiten"
         android:title="Projektname bearbeiten"
         android:icon="@android:drawable/ic_menu_edit"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/menu_projekt_auswaehlen"
         android:title="Projektname auswählen"
         android:icon="@android:drawable/ic_menu_set_as"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
+
 
     <item
         android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:orderInCategory="100"
-        app:showAsAction="never">
+        app:showAsAction="collapseActionView">
         <menu>
             <group android:checkableBehavior="single">
                 <item android:title="@string/noMoving"

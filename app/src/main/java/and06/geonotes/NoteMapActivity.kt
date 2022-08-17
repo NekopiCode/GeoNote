@@ -45,7 +45,7 @@ class NoteMapActivity : AppCompatActivity() {
         notizen.forEach {
             val marker = Marker(map)
             marker.position = GeoPoint(it.latitude, it.longitude)
-            marker.title = it.notiz
+            marker.title = it.thema
             marker.snippet = it.notiz
             map.overlays.add(marker)
         }

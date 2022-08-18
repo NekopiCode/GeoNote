@@ -4,7 +4,7 @@
 
 
     <item
-        android:id="@+id/notizLoeschen"
+        android:id="@+id/menu_notiz_Loeschen"
         android:title="Notiz Löschen"
         android:icon="@android:drawable/ic_menu_delete"
         app:showAsAction="always" />

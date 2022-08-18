@@ -163,9 +163,7 @@ class GatherActivity : AppCompatActivity() {
 
         override fun onNothingSelected(p0: AdapterView<*>?) {
         }
-
     }
-
 
     // Button - Standort anzeigen
     fun onButtonStandortAnzeigenClick(view: View?) {
@@ -247,7 +245,7 @@ class GatherActivity : AppCompatActivity() {
             }
             R.id.menu_projekt_bearbeiten -> { openProjektBearbeitenDialog() }
             R.id.menu_projekt_auswaehlen -> { openProjektAuswaehlenDialog() }
-            R.id.notizLoeschen -> {notizLoeschen()} 
+            R.id.menu_notiz_Loeschen -> { notizLoeschen() }
         }
         return super.onOptionsItemSelected(item)
     }

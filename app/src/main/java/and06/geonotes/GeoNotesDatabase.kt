@@ -77,17 +77,10 @@ data class Notiz(@PrimaryKey(autoGenerate = true)
     @Query("SELECT * from notizen where id = :id")
     fun getNotiz(id: Long): Notiz
 
-    @Query("SELECT * from notizen where notiz")
-    fun checkNotizen(): Notiz
+    @Query("DELETE from notizen where notiz = :delete")
+    fun deleteNotiz(delete: Notiz): Notiz
 
-/*
-    @Query("SELECT * from notizen where notiz")
-    fun checkNotiz() : String
 
-    @Query("SELECT * from notizen where thema")
-    fun checkThema() : String
-
- */
 
 
 }

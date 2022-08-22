@@ -236,7 +236,7 @@ class GatherActivity : AppCompatActivity() {
                     R.id.item_bicycle to (4000L to 25.0f),
                     R.id.item_car to (4000L to 50.0f),
                     R.id.item_car_fast to (4000L to 100.0f),
-                    R.id.item_nichtBewegen to (60000L to 5.0f)
+                    R.id.item_nichtBewegen to (60000L to 1.0f)
                 )
                 val pair = map.get(id) ?: return true
                 minTime = pair.first
@@ -249,19 +249,57 @@ class GatherActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
+
     // Toolbar Button - Delete Current Note and last Project with last Note.
     fun notizLoeschen () {
-
-        with(AlertDialog.Builder(this)) {
-            setTitle("Aktuelle Notiz löschen?")
-            setPositiveButton("OK", DialogInterface.OnClickListener{ _, _ ->
-                Toast.makeText(applicationContext, "Test Implementation", Toast.LENGTH_SHORT).show()
-            })
-            setNegativeButton("ABBRECHEN", DialogInterface.OnClickListener{ _, _ ->
-                Toast.makeText(applicationContext, "Test Implementation", Toast.LENGTH_SHORT).show()
-            }).show()
+        val database = GeoNotesDatabase.getInstance(this)
+        CoroutineScope(Dispatchers.Main).launch {
+            var notizen: List<Notiz>? = null
+            withContext(Dispatchers.IO) {
+                notizen = database.notizenDao().getNotizen(aktuellesProjekt.id)
+            }
+            if (aktuelleNotiz == null) {
+                Toast.makeText(applicationContext, "Notiz wurde nicht ausgewählt!!", Toast.LENGTH_SHORT).show()
+                return@launch
+            } else {
+                if (notizen?.size == 1){
+                    with(AlertDialog.Builder(this@GatherActivity)){
+                        setTitle("Löschen der letzten Notiz löscht das Projekt. Fortfahren?")
+                        setPositiveButton("OK", DialogInterface.OnClickListener { dialog, id ->
+                            CoroutineScope(Dispatchers.Main).launch {
+                                withContext(Dispatchers.IO){
+                                    database.projekteDao().deleteAllNoteFromProjekt(aktuellesProjekt.id)
+                                    database.projekteDao().deleteProjekt(aktuellesProjekt.id)
+                                    aktuelleNotiz = null
+                                    aktuellesProjekt = Projekt(Date().getTime(), "")
+                                }
+                            }
+                            findViewById<TextView>(R.id.textview_Aktuelles_Projekt).setText("Projekt gelöscht!")
+                            findViewById<TextView>(R.id.edittext_thema).setText("")
+                            findViewById<TextView>(R.id.edittext_notiz).setText("")
+                        })
+                        setNegativeButton("Abbrechen", DialogInterface.OnClickListener { dialog, id ->
+                        }).show()
+                    }
+                } else {
+                    with(AlertDialog.Builder(this@GatherActivity)) {
+                        setTitle("Aktuelle Notiz löschen?")
+                        setPositiveButton("OK", DialogInterface.OnClickListener { dialog, id ->
+                            GlobalScope.launch {
+                                database.notizenDao().deleteNoteWithID(aktuelleNotiz?.id)
+                                aktuelleNotiz = null
+                            }
+                            findViewById<TextView>(R.id.edittext_thema).setText("")
+                            findViewById<TextView>(R.id.edittext_notiz).setText("")
+                        })
+                        setNegativeButton("Abbrechen", DialogInterface.OnClickListener { dialog, id ->
+                        }).show()
+                    }
+                }
+            }
         }
     }
+
 
     // AlertDialog, Database zugang - Fenster zum bearbeiten von Projektbeschreibung
     fun openProjektBearbeitenDialog() {
@@ -322,8 +360,7 @@ class GatherActivity : AppCompatActivity() {
                         // Aktuelles Projekt auf ausgewähltes Projekt setzen
                         aktuellesProjekt = projekte?.get(id)!!
                         val textView = findViewById<TextView>(R.id.textview_Aktuelles_Projekt)
-                        textView.text = getString(R.string.aktuelles_projekt_prefix) +
-                                aktuellesProjekt.getDescription()
+                        textView.text = getString(R.string.aktuelles_projekt_prefix) + aktuellesProjekt.getDescription()
                         // Notiz zum Projekt anzeigen
                         CoroutineScope(Dispatchers.Main).launch {
                             withContext(Dispatchers.IO) {
@@ -339,12 +376,12 @@ class GatherActivity : AppCompatActivity() {
         }
     }
 
+    //Notiz - Auto Save
     fun autoSave() {
         val themaText = findViewById<TextView>(R.id.edittext_thema).text.toString().trim()
         val notizText = findViewById<TextView>(R.id.edittext_notiz).text.toString().trim()
         val database = GeoNotesDatabase.getInstance(this)
 
-        // Notiz - Auto Save
         GlobalScope.launch {
             if (aktuelleNotiz != null) {
                 if (notizText != aktuelleNotiz?.notiz.toString() || themaText != aktuelleNotiz?.thema.toString()) {
@@ -456,7 +493,7 @@ class GatherActivity : AppCompatActivity() {
                 Log.d(javaClass.simpleName, "Notiz $aktuelleNotiz aktualisiert")
             }
         }
-        with (AlertDialog.Builder(this)) {
+        with(AlertDialog.Builder(this)) {
             setTitle("Notiz weiter bearbeiten?")
             setNegativeButton("Nein", DialogInterface.OnClickListener
             { dialog, id ->
@@ -469,14 +506,13 @@ class GatherActivity : AppCompatActivity() {
         }
     }
 
-
     // Button - Vorherige Notiz & Nächste Notiz
     fun onButtonVorherigeNotizClick(view: View) {
         val textViewThema = findViewById<TextView>(R.id.edittext_thema)
         val textViewNotiz = findViewById<TextView>(R.id.edittext_notiz)
         if (aktuelleNotiz == null) {
-            if (textViewThema.text.isNotEmpty() ||
-                textViewNotiz.text.isNotEmpty()) { // Fall 1
+            if (textViewThema.text.isNotEmpty() || textViewNotiz.text.isNotEmpty()) {
+                // Fall 1
                 Toast.makeText(this, "Notiz wurde noch nicht gespeichert",
                     Toast.LENGTH_LONG).show()
                 return
@@ -491,7 +527,7 @@ class GatherActivity : AppCompatActivity() {
                     // Fall 2
                 } else {
                     notizen = database.notizenDao().getPreviousNotizen(aktuelleNotiz?.id!!,
-                            aktuellesProjekt.id) // Fall 3
+                        aktuellesProjekt.id) // Fall 3
                 }
             }
             if (!notizen.isNullOrEmpty()) {
@@ -502,6 +538,7 @@ class GatherActivity : AppCompatActivity() {
         }
         autoSave()
     }
+
 
     fun onButtonNaechsteNotizClick(view: View) {
         val textViewThema = findViewById<TextView>(R.id.edittext_thema)
@@ -514,7 +551,6 @@ class GatherActivity : AppCompatActivity() {
             }
             return // Fall 1 und Fall 2
         }
-
         val database = GeoNotesDatabase.getInstance(this)
         CoroutineScope(Dispatchers.Main).launch {
             var notizen: List<Notiz>? = null
@@ -531,6 +567,7 @@ class GatherActivity : AppCompatActivity() {
                 textViewNotiz.text = ""
             }
         }
+        return
         autoSave()
     }
 

@@ -49,6 +49,13 @@ data class Notiz(@PrimaryKey(autoGenerate = true)
 
     @Query("SELECT * FROM projekte where id=:id")
     fun getProjekt(id: Long): Projekt
+
+    @Query("DELETE FROM notizen where projektId=:id")
+    fun deleteAllNoteFromProjekt(id: Long) :Int
+
+    @Query("DELETE FROM projekte where id=:id")
+    fun deleteProjekt(id: Long) : Int
+
 }
 @Dao interface LocationsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -77,8 +84,11 @@ data class Notiz(@PrimaryKey(autoGenerate = true)
     @Query("SELECT * from notizen where id = :id")
     fun getNotiz(id: Long): Notiz
 
-    @Query("DELETE from notizen where notiz = :delete")
-    fun deleteNotiz(delete: Notiz): Notiz
+    @Query("DELETE from notizen where id = :id")
+    fun deleteNoteWithID(id: Long?): Int
+
+
+
 
 
 

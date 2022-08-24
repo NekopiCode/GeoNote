@@ -8,6 +8,7 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.preference.Preference
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -19,6 +20,7 @@ import androidx.appcompat.widget.Toolbar
 import kotlinx.coroutines.*
 import java.text.DateFormat
 import java.util.*
+import java.util.prefs.Preferences
 import kotlin.collections.ArrayList
 
 
@@ -32,6 +34,9 @@ class GatherActivity : AppCompatActivity() {
         var minDistance = 25.0f // in Metern
         val NOTIZEN = "notizen"
         val INDEX_AKTUELLE_NOTIZ = "index_aktuelle_notiz"
+        val AKTUELLES_PROJEKT = "aktuelles_projekt"
+        val AKTUELLE_NOTIZ = "aktuelle_notiz"
+
     }
 
     var aktuellesProjekt = Projekt(Date().getTime(), "")
@@ -49,10 +54,6 @@ class GatherActivity : AppCompatActivity() {
                 android.Manifest.permission.ACCESS_COARSE_LOCATION
             ), 0
         )
-
-        // Datum "textview_aktuelles_projekt"
-        val textview = findViewById<TextView>(R.id.textview_Aktuelles_Projekt)
-        textview.append(aktuellesProjekt.getDescription())
 
         // Location Manager
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -84,11 +85,30 @@ class GatherActivity : AppCompatActivity() {
             spinner.setSelection(providers.indexOf("gps"))
 
         // Toolbar
+        //val textview = findViewById<TextView>(R.id.textview_aktuelles_projekt)
+        val textview = findViewById<TextView>(R.id.textview_Aktuelles_Projekt)
+        textview.append(aktuellesProjekt.getDescription())
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
+        if (savedInstanceState != null) {
+            aktuellesProjekt =
+                savedInstanceState.getParcelable(AKTUELLES_PROJEKT)!!
+            val notiz: Notiz? =
+                savedInstanceState.getParcelable(AKTUELLE_NOTIZ)
+            if (notiz != null) aktuelleNotiz = notiz!!
+            return
+        }
 
+        val projektId = getSharedPreferences("PREFERENCES", Context.MODE_PRIVATE).getLong("ID_ZULETZT_GEOEFFNETES_PROJEKT", 0)
 
     }// onCreate End
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelable(AKTUELLES_PROJEKT, aktuellesProjekt)
+        if (aktuelleNotiz != null)
+            outState.putParcelable(AKTUELLE_NOTIZ, aktuelleNotiz)
+    }
 
     private fun showProperties(manager: LocationManager, providerName: String): String {
         val locationProvider = manager.getProvider(providerName)

@@ -6,9 +6,10 @@ import kotlinx.android.parcel.Parcelize
 import java.text.DateFormat
 
 
-@Entity(tableName= "projekte")
 
-data class Projekt(@PrimaryKey val id: Long, var beschreibung: String?) {
+@Parcelize
+@Entity(tableName= "projekte")
+data class Projekt(@PrimaryKey val id: Long, var beschreibung: String?): Parcelable {
     fun getDescription(): String {
         val dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT) // Import!
         val dateString = dateFormat.format(id)

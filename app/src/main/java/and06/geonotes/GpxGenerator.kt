@@ -2,18 +2,31 @@ package and06.geonotes
 
 import android.content.Context
 import android.net.Uri
+import android.os.Environment
 import android.util.Log
+import androidx.core.content.FileProvider
 import org.w3c.dom.Document
+import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.parsers.ParserConfigurationException
-
+import javax.xml.transform.TransformerConfigurationException
+import javax.xml.transform.TransformerException
+import javax.xml.transform.TransformerFactory
+import javax.xml.transform.dom.DOMSource
+import javax.xml.transform.stream.StreamResult
 
 
 class GpxGenerator {
+
     fun createGpxFile(context: Context, notizen: List<Notiz>): Uri? {
         val document = createGpxDocument()
-        return null // provisorisch!
+        return document?.let {
+            createRootElement(it)
+            appendTrackPoints(it, notizen)
+            serialize(context, it)
+        }
     }
+
     private fun createGpxDocument(): Document? {
         val factory = DocumentBuilderFactory.newInstance()
         val gpxDocument =
@@ -26,4 +39,55 @@ class GpxGenerator {
         }
         return gpxDocument
     }
+
+    private fun createRootElement(document: Document) {
+        with(document.createElement("gpx")) {
+            setAttribute("xmlns", "https://www.topografix.com/GPX/1/1/")
+            setAttribute("xmlns:xsi", "https://www.w3.org/2001/ XMLSchema-instance")
+                    setAttribute( "xsi:schemaLocation", "https:// www.topografix.com/GPX/1/1/gpx.xsd https:// www.topografix.com/GPX/1/1/gpx.xsd")
+                    setAttribute("version", "1.1")
+            setAttribute("creator", "GeoNotes")
+            document.appendChild(this)
+        }
+    }
+
+    private fun appendTrackPoints(document: Document, notizen: List<Notiz>) {
+        val trk = document.createElement("trk")
+        document.documentElement.appendChild(trk)
+        val trkseg = document.createElement("trkseg")
+        trk.appendChild(trkseg)
+        notizen.forEach {
+            with(document.createElement("trkpt")) {
+                setAttribute("lat", it.latitude.toString())
+                setAttribute("lon", it.longitude.toString())
+                val name = document.createElement("name")
+                name.appendChild(document.createTextNode(it.thema))
+                appendChild(name)
+                val desc = document.createElement("desc")
+                desc.appendChild(document.createTextNode(it.notiz))
+                appendChild(desc)
+                trkseg.appendChild(this)
+            }
+        }
+    }
+
+    private fun serialize(context: Context, document: Document): Uri? {
+        val documentsDirectory = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
+        val destFile = File(documentsDirectory, "geonotes.gpx")
+        val factory = TransformerFactory.newInstance()
+        val uri = try {
+            val transformer = factory.newTransformer()
+            transformer.transform(DOMSource(document.documentElement), StreamResult(destFile))
+            FileProvider.getUriForFile(context, "geonotes.fileprovider", destFile)
+        } catch (ex: TransformerConfigurationException) {
+            Log.d(javaClass.simpleName, ex.toString())
+            null
+        } catch (ex: TransformerException) {
+            Log.d(javaClass.simpleName, ex.toString())
+            null
+        }
+        return uri
+    }
+
+
 }

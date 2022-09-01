@@ -8,6 +8,7 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.os.Environment
 import android.preference.Preference
 import android.util.Log
 import android.view.Menu
@@ -266,8 +267,39 @@ class GatherActivity : AppCompatActivity() {
             R.id.menu_projekt_bearbeiten -> { openProjektBearbeitenDialog() }
             R.id.menu_projekt_auswaehlen -> { openProjektAuswaehlenDialog() }
             R.id.menu_notiz_Loeschen -> { notizLoeschen() }
+            R.id.menu_projekt_versenden -> { projektVersenden() }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    // GPX versenden/Geo Daten
+    fun projektVersenden() {
+        if (!Environment.MEDIA_MOUNTED.equals(Environment.
+            getExternalStorageState())) {
+            Toast.makeText(this, "External Storage nicht verfügbar",
+                Toast.LENGTH_LONG).show()
+            return
+        }
+        val database = GeoNotesDatabase.getInstance(this)
+        GlobalScope.launch {
+            val notizen =
+                database.notizenDao().getNotizen(aktuellesProjekt.id)
+            if (notizen.isNullOrEmpty()) {
+                Toast.makeText(this@GatherActivity, "keine Notizen vorhanden", Toast.LENGTH_LONG).show()
+                    return@launch
+            }
+            val generator = GpxGenerator()
+            val uri = generator.createGpxFile(this@GatherActivity,
+                notizen)
+            with(Intent(Intent.ACTION_SEND)) {
+                type = "text/xml"
+                putExtra(Intent.EXTRA_EMAIL, arrayOf("xxx@test.com"))
+                putExtra(Intent.EXTRA_SUBJECT,
+                    aktuellesProjekt.getDescription())
+                putExtra(Intent.EXTRA_STREAM, uri)
+                startActivity(Intent.createChooser(this, "Mail versenden"))
+            }
+        }
     }
 
     // Toolbar Button - Delete Current Note and last Project with last Note.

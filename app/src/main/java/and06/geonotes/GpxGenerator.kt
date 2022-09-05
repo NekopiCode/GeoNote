@@ -18,10 +18,11 @@ import javax.xml.transform.stream.StreamResult
 
 class GpxGenerator {
 
-    fun createGpxFile(context: Context, notizen: List<Notiz>): Uri? {
+    fun createGpxFile(context: Context, notizen: List<Notiz>, projektName: String): Uri? {
         val document = createGpxDocument()
         return document?.let {
             createRootElement(it)
+            createMetaData(it, projektName)
             appendTrackPoints(it, notizen)
             serialize(context, it)
         }
@@ -87,6 +88,14 @@ class GpxGenerator {
             null
         }
         return uri
+    }
+
+    private fun createMetaData(document: Document, projektName: String) {
+        val metadata = document.createElement("medatadata")
+        document.documentElement.appendChild(metadata)
+        val name = document.createElement("desc")
+        name.appendChild(document.createTextNode(projektName))
+        metadata.appendChild(name)
     }
 
 

@@ -14,6 +14,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.webkit.JavascriptInterface
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -268,6 +269,8 @@ class GatherActivity : AppCompatActivity() {
             R.id.menu_projekt_auswaehlen -> { openProjektAuswaehlenDialog() }
             R.id.menu_notiz_Loeschen -> { notizLoeschen() }
             R.id.menu_projekt_versenden -> { projektVersenden() }
+            R.id.menu_osm_oeffnen -> { openWebView() }
+
         }
         return super.onOptionsItemSelected(item)
     }
@@ -290,7 +293,7 @@ class GatherActivity : AppCompatActivity() {
             }
             val generator = GpxGenerator()
             val uri = generator.createGpxFile(this@GatherActivity,
-                notizen)
+                notizen, aktuellesProjekt.getDescription())
             with(Intent(Intent.ACTION_SEND)) {
                 type = "text/xml"
                 putExtra(Intent.EXTRA_EMAIL, arrayOf("xxx@test.com"))
@@ -639,6 +642,27 @@ class GatherActivity : AppCompatActivity() {
                 aktuelleNotiz = notiz
                 findViewById<TextView>(R.id.edittext_thema).text = aktuelleNotiz?.thema
                 findViewById<TextView>(R.id.edittext_notiz).text = aktuelleNotiz?.notiz
+            }
+        }
+    }
+
+    fun openWebView() {
+        if (aktuelleNotiz == null) {
+            Toast.makeText(this, "Bitte Notiz auswählen oder speichern",
+                Toast.LENGTH_LONG).show()
+            return
+        }
+        val database = GeoNotesDatabase.getInstance(this)
+        CoroutineScope(Dispatchers.Main).launch {
+            var notizen: List<Notiz>? = null
+            withContext(Dispatchers.IO) {
+                notizen = database.notizenDao().getNotizen(aktuellesProjekt.id)
+            }
+            notizen?.also {
+                val intent = Intent(this@GatherActivity, OsmWebViewActivity::class.java)
+                intent.putParcelableArrayListExtra(NOTIZEN, ArrayList<Notiz>(it))
+                intent.putExtra(INDEX_AKTUELLE_NOTIZ, it.indexOf(aktuelleNotiz!!))
+                startActivity(intent)
             }
         }
     }

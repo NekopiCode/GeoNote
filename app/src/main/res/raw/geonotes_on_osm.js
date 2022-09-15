@@ -1,3 +1,4 @@
+
 var indexAktuelleNotiz = Android.getIndexAktuelleNotiz();
 var map = new ol.Map({
 target: 'map',
@@ -10,13 +11,14 @@ view: new ol.View({
 center:
 ol.proj.fromLonLat([Android.getLongitude(indexAktuelleNotiz),
 Android.getLatitude(indexAktuelleNotiz)]),
-zoom: 12
+zoom: 13
 })
 });
 var iconStyle = new ol.style.Style({
 image: new ol.style.Icon( ({
-anchor: [0.5, 0.5], anchorXUnits: 'fraction',
-                    anchorYUnits: 'fraction',
+anchor: [0.5, 0.9],
+anchorXUnits: 'fraction',
+anchorYUnits: 'fraction',
                     opacity: 0.75,
                     src: 'marker.png'
                     }))
@@ -33,12 +35,27 @@ anchor: [0.5, 0.5], anchorXUnits: 'fraction',
                     });
                     iconFeature.setStyle(iconStyle);
                     iconFeatures.push(iconFeature);
+
+                    for (var i = 0; i < Android.getNotizenCount(); i++) {
+                    var iconFeature = new ol.Feature({
+                    geometry: new
+                    ol.geom.Point(ol.proj.transform([Android.getLongitude(i),
+                    Android.getLatitude(i)], 'EPSG:4326',
+                    'EPSG:3857')),
+                    name: Android.getThema(i),
+                    description: Android.getNotiz(i),
+                    });
+                    iconFeature.setStyle(iconStyle);
+                    iconFeatures.push(iconFeature);
+                    }
+
                     var layer = new ol.layer.Vector({
                     source: new ol.source.Vector({
                     features: iconFeatures
                     })
                     });
                     map.addLayer(layer);
+
                     var container = document.getElementById('popup');
                     var content = document.getElementById('popup-content');
                     var closer = document.getElementById('popup-closer');
@@ -63,16 +80,3 @@ anchor: [0.5, 0.5], anchorXUnits: 'fraction',
                     }
                     });
 
-                    var iconFeatures=[];
-                    for (var i = 0; i < Android.getNotizenCount(); i++) {
-                    var iconFeature = new ol.Feature({
-                    geometry: new
-                    ol.geom.Point(ol.proj.transform([Android.getLongitude(i),
-                    Android.getLatitude(i)], 'EPSG:4326',
-                    'EPSG:3857')),
-                    name: Android.getThema(i),
-                    description: Android.getNotiz(i),
-                    });
-                    iconFeature.setStyle(iconStyle);
-                    iconFeatures.push(iconFeature);
-                    }

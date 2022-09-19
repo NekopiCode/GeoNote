@@ -216,16 +216,12 @@ class GatherActivity : AppCompatActivity() {
                 }
                 alertDialog_Builder_Activity_Map_Show_Choice.setPositiveButton("OK"){ _,_->
                     if (checkedItem == 1){
-                        var intentWebView = intentNoteMap.setClass(this@GatherActivity, OsmWebViewActivity::class.java)
-                        intentWebView.putParcelableArrayListExtra(NOTIZEN, ArrayList<Notiz>(notizen!!))
-                        intentWebView.putExtra(INDEX_AKTUELLE_NOTIZ, notizen?.indexOf(aktuelleNotiz!!))
-                        startActivity(intentWebView)
-                        checkedItem = 0
-                        Toast.makeText(applicationContext, "OsmWebViewActivity wurde Aktiviert", Toast.LENGTH_LONG).show()
-                    } else {
-                        checkedItem = 0
+                        intentNoteMap.setClass(this@GatherActivity, OsmWebViewActivity::class.java)
                         startActivity(intentNoteMap)
-                        Toast.makeText(applicationContext, "NoteMapActivity wurde Aktiviert", Toast.LENGTH_LONG).show()
+                        Toast.makeText(applicationContext, "OsmWebViewActivity wurde Aktiviert", Toast.LENGTH_SHORT).show()
+                    } else {
+                        startActivity(intentNoteMap)
+                        Toast.makeText(applicationContext, "NoteMapActivity wurde Aktiviert", Toast.LENGTH_SHORT).show()
                     }
                 }
                 alertDialog_Builder_Activity_Map_Show_Choice.setNegativeButton("ABBRECHEN"){_,_ ->

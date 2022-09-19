@@ -21,8 +21,10 @@
         <item>Zweites Projekt</item>
         <item>Drittes Projekt</item>
     </string-array>
-
-
+    <string-array name="standort_Anzeige_Auswahl">
+        <item>NoteMapActivity</item>
+        <item>WebViewActivity</item>
+    </string-array>
     <string-array name="auswahlliste">
         <item>passiv</item>
         <item>gps</item>

@@ -201,13 +201,50 @@ class GatherActivity : AppCompatActivity() {
                 notizen = database.notizenDao().getNotizen(aktuellesProjekt.id)
             }
             if (!notizen.isNullOrEmpty()) {
-                val intent = Intent(this@GatherActivity, NoteMapActivity::class.java)
-                intent.putParcelableArrayListExtra(NOTIZEN, ArrayList<Notiz>(notizen!!))
-                intent.putExtra(INDEX_AKTUELLE_NOTIZ, notizen?.indexOf(aktuelleNotiz!!))
+
+                var intentNoteMap = Intent(this@GatherActivity, NoteMapActivity::class.java)
+                intentNoteMap.putParcelableArrayListExtra(NOTIZEN, ArrayList<Notiz>(notizen!!))
+                intentNoteMap.putExtra(INDEX_AKTUELLE_NOTIZ, notizen?.indexOf(aktuelleNotiz!!))
+
+                val selectItemArray = resources.getStringArray(R.array.standort_Anzeige_Auswahl)
+                var checkedItem = 0
+                val alertDialog_Builder_Activity_Map_Show_Choice = AlertDialog.Builder(this@GatherActivity)
+                alertDialog_Builder_Activity_Map_Show_Choice.setTitle("Anzeige des Standorts")
+                alertDialog_Builder_Activity_Map_Show_Choice.setSingleChoiceItems(selectItemArray, checkedItem) {_, which: Int ->
+                    checkedItem = which
+
+                }
+                alertDialog_Builder_Activity_Map_Show_Choice.setPositiveButton("OK"){ _,_->
+                    if (checkedItem == 1){
+                        var intentWebView = intentNoteMap.setClass(this@GatherActivity, OsmWebViewActivity::class.java)
+                        intentWebView.putParcelableArrayListExtra(NOTIZEN, ArrayList<Notiz>(notizen!!))
+                        intentWebView.putExtra(INDEX_AKTUELLE_NOTIZ, notizen?.indexOf(aktuelleNotiz!!))
+                        startActivity(intentWebView)
+                        checkedItem = 0
+                        Toast.makeText(applicationContext, "OsmWebViewActivity wurde Aktiviert", Toast.LENGTH_LONG).show()
+                    } else {
+                        checkedItem = 0
+                        startActivity(intentNoteMap)
+                        Toast.makeText(applicationContext, "NoteMapActivity wurde Aktiviert", Toast.LENGTH_LONG).show()
+                    }
+                }
+                alertDialog_Builder_Activity_Map_Show_Choice.setNegativeButton("ABBRECHEN"){_,_ ->
+                }
+
+                //alertDialog_Builder_Activity_Map_Show_Choice.create()
+                alertDialog_Builder_Activity_Map_Show_Choice.show()
+
+
+
                 startActivityForResult(intent, 0)
             }
         }
         autoSave()
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        finishActivity(0)
     }
 
     fun initSpinnerProviders() {

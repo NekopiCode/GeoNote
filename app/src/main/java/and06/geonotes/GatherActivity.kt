@@ -212,7 +212,6 @@ class GatherActivity : AppCompatActivity() {
                 alertDialog_Builder_Activity_Map_Show_Choice.setTitle("Anzeige des Standorts")
                 alertDialog_Builder_Activity_Map_Show_Choice.setSingleChoiceItems(selectItemArray, checkedItem) {_, which: Int ->
                     checkedItem = which
-
                 }
                 alertDialog_Builder_Activity_Map_Show_Choice.setPositiveButton("OK"){ _,_->
                     if (checkedItem == 1){
@@ -227,21 +226,14 @@ class GatherActivity : AppCompatActivity() {
                 alertDialog_Builder_Activity_Map_Show_Choice.setNegativeButton("ABBRECHEN"){_,_ ->
                 }
 
-                //alertDialog_Builder_Activity_Map_Show_Choice.create()
+                alertDialog_Builder_Activity_Map_Show_Choice.create()
                 alertDialog_Builder_Activity_Map_Show_Choice.show()
-
-
-
-                startActivityForResult(intent, 0)
+                //startActivityForResult(intentNoteMap, 0)
             }
         }
         autoSave()
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        finishActivity(0)
-    }
 
     fun initSpinnerProviders() {
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager

@@ -694,7 +694,8 @@ class GatherActivity : AppCompatActivity() {
         }
     }
 
-    fun googleMapIntent() {
+    //Intent - Google Map - not finish
+    fun openGoogleMap() {
         if (aktuelleNotiz == null) {
             Toast.makeText(this, "Bitte Notiz auswählen oder speichern",
                 Toast.LENGTH_LONG).show()
@@ -714,9 +715,6 @@ class GatherActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
-    }
-    fun openGoogleMap () {
-
     }
 
 }

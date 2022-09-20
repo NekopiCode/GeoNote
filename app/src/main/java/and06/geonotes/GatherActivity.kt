@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.preference.Preference
@@ -295,6 +296,7 @@ class GatherActivity : AppCompatActivity() {
             R.id.menu_notiz_Loeschen -> { notizLoeschen() }
             R.id.menu_projekt_versenden -> { projektVersenden() }
             R.id.menu_osm_oeffnen -> { openWebView() }
+            R.id.menu_in_googlemap_oeffnen -> { openGoogleMap() }
 
         }
         return super.onOptionsItemSelected(item)
@@ -690,6 +692,31 @@ class GatherActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+    }
+
+    fun googleMapIntent() {
+        if (aktuelleNotiz == null) {
+            Toast.makeText(this, "Bitte Notiz auswählen oder speichern",
+                Toast.LENGTH_LONG).show()
+            return
+        }
+        val database = GeoNotesDatabase.getInstance(this)
+        CoroutineScope(Dispatchers.Main).launch {
+            var notizen: List<Notiz>? = null
+            withContext(Dispatchers.IO) {
+                notizen = database.notizenDao().getNotizen(aktuellesProjekt.id)
+            }
+            notizen?.also {
+                val googleMapUri = Uri.parse()
+
+                intent.putParcelableArrayListExtra(NOTIZEN, ArrayList<Notiz>(it))
+                intent.putExtra(INDEX_AKTUELLE_NOTIZ, it.indexOf(aktuelleNotiz!!))
+                startActivity(intent)
+            }
+        }
+    }
+    fun openGoogleMap () {
+
     }
 
 }

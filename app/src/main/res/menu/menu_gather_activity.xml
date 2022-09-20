@@ -26,6 +26,10 @@
         android:icon="@android:drawable/ic_menu_send"
         app:showAsAction="ifRoom"/>
 
+    <item android:id="@+id/menu_in_googlemap_oeffnen"
+        android:title="In Google Map anzeigen"
+        app:showAsAction="ifRoom"/>
+
     <item android:id="@+id/menu_osm_oeffnen"
         android:title="In Webview anzeigen"
         android:icon="@android:drawable/ic_menu_directions"

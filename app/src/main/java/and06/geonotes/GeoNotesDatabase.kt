@@ -94,6 +94,7 @@ data class Notiz(@PrimaryKey(autoGenerate = true)
 
 
 
+
 }
 @Database(entities = [Projekt::class, Notiz::class, Location::class], version = 1)
 

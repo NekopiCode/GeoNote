@@ -10,20 +10,18 @@ import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
-import android.preference.Preference
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.webkit.JavascriptInterface
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import kotlinx.coroutines.*
+import org.osmdroid.util.GeoPoint
 import java.text.DateFormat
 import java.util.*
-import java.util.prefs.Preferences
 import kotlin.collections.ArrayList
 
 
@@ -103,6 +101,33 @@ class GatherActivity : AppCompatActivity() {
         }
 
         val projektId = getSharedPreferences("PREFERENCES", Context.MODE_PRIVATE).getLong("ID_ZULETZT_GEOEFFNETES_PROJEKT", 0)
+
+
+        findViewById<Button>(R.id.button_test).setOnClickListener {
+            if (aktuelleNotiz == null) {
+                Toast.makeText(this, "Bitte Notiz auswählen oder speichern",
+                    Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+            val database = GeoNotesDatabase.getInstance(this)
+            CoroutineScope(Dispatchers.Main).launch {
+                var notizen: List<Notiz>? = null
+                withContext(Dispatchers.IO) {
+                    notizen = database.notizenDao().getNotizen(aktuellesProjekt.id)
+                }
+                notizen?.also {
+                    var currentNoteLocation = "${aktuelleNotiz!!.latitude}, ${aktuelleNotiz!!.longitude}"
+                    Toast.makeText(applicationContext, "$currentNoteLocation", Toast.LENGTH_SHORT).show()
+
+                    val gmmIntentUri = Uri.parse("geo:${currentNoteLocation}")
+                    val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                    mapIntent.setPackage("com.google.android.apps.maps")
+                    startActivity(mapIntent)
+
+
+                }
+            }
+        }
 
     }// onCreate End
 
@@ -708,11 +733,15 @@ class GatherActivity : AppCompatActivity() {
                 notizen = database.notizenDao().getNotizen(aktuellesProjekt.id)
             }
             notizen?.also {
-                val googleMapUri = Uri.parse()
+                var currentNoteLocation = "${aktuelleNotiz!!.latitude}, ${aktuelleNotiz!!.longitude}"
+                Toast.makeText(applicationContext, "$currentNoteLocation", Toast.LENGTH_SHORT).show()
 
-                intent.putParcelableArrayListExtra(NOTIZEN, ArrayList<Notiz>(it))
-                intent.putExtra(INDEX_AKTUELLE_NOTIZ, it.indexOf(aktuelleNotiz!!))
-                startActivity(intent)
+                val gmmIntentUri = Uri.parse("geo:${currentNoteLocation}")
+                val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                mapIntent.setPackage("com.google.android.apps.maps")
+                startActivity(mapIntent)
+
+
             }
         }
     }

@@ -102,33 +102,6 @@ class GatherActivity : AppCompatActivity() {
 
         val projektId = getSharedPreferences("PREFERENCES", Context.MODE_PRIVATE).getLong("ID_ZULETZT_GEOEFFNETES_PROJEKT", 0)
 
-
-        findViewById<Button>(R.id.button_test).setOnClickListener {
-            if (aktuelleNotiz == null) {
-                Toast.makeText(this, "Bitte Notiz auswählen oder speichern",
-                    Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-            val database = GeoNotesDatabase.getInstance(this)
-            CoroutineScope(Dispatchers.Main).launch {
-                var notizen: List<Notiz>? = null
-                withContext(Dispatchers.IO) {
-                    notizen = database.notizenDao().getNotizen(aktuellesProjekt.id)
-                }
-                notizen?.also {
-                    var currentNoteLocation = "${aktuelleNotiz!!.latitude}, ${aktuelleNotiz!!.longitude}"
-                    Toast.makeText(applicationContext, "$currentNoteLocation", Toast.LENGTH_SHORT).show()
-
-                    val gmmIntentUri = Uri.parse("geo:${currentNoteLocation}")
-                    val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
-                    mapIntent.setPackage("com.google.android.apps.maps")
-                    startActivity(mapIntent)
-
-
-                }
-            }
-        }
-
     }// onCreate End
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -734,9 +707,9 @@ class GatherActivity : AppCompatActivity() {
             }
             notizen?.also {
                 var currentNoteLocation = "${aktuelleNotiz!!.latitude}, ${aktuelleNotiz!!.longitude}"
-                Toast.makeText(applicationContext, "$currentNoteLocation", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(applicationContext, "$currentNoteLocation", Toast.LENGTH_SHORT).show()
 
-                val gmmIntentUri = Uri.parse("geo:${currentNoteLocation}")
+                val gmmIntentUri = Uri.parse("geo:0,0?q=${currentNoteLocation}(Thema: ${aktuelleNotiz!!.thema}  |  Notiz: ${aktuelleNotiz!!.notiz} )")
                 val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
                 mapIntent.setPackage("com.google.android.apps.maps")
                 startActivity(mapIntent)
